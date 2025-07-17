@@ -228,20 +228,20 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     actor Client
-    participant OrderLineController
+    participant ProductController
     participant OrderLineService
     participant OrderLineRepository
     
-    Client->>OrderLineController: GET  /products/top<br/> {reqParam (Limit: ? => default: 5)}
+    Client->>ProductController: GET  /products/top<br/> {reqParam (Limit: ? => default: 5)}
     alt 잘못된 상위 랭킹 개수 제한 요청
-        OrderLineController->>Client: 400 Bad Request
+        ProductController->>Client: 400 Bad Request
         
     end
-    OrderLineController->>OrderLineService: 날짜 기준 인기 판매<br/> 상품 목록 호출
+    ProductController->>OrderLineService: 날짜 기준 인기 판매<br/> 상품 목록 호출
     OrderLineService->>OrderLineService: 날짜 기준 조회 범위 데이터 생성
     OrderLineService->>OrderLineRepository: 날짜 기준 조회 요청<br/>(+조회 기준)
     OrderLineRepository->>OrderLineRepository: JOIN Product<br/>WHERE 주문완료, 날짜 범위<br/>GROUP BY 상품 ID 집계<br/>ROW_NUM <= limit
     OrderLineRepository->>OrderLineService: 주문 완료 정보 중<br/>상품 정보 집계<br/>상위 n개 목록 반환<br/>OrderRanking List
-    OrderLineService->>OrderLineController: OrderRanking 목록 정보
-    OrderLineController->>Client: 200 OK
+    OrderLineService->>ProductController: OrderRanking 목록 정보
+    ProductController->>Client: 200 OK
 ```
