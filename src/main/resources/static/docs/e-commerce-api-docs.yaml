@@ -1,0 +1,667 @@
+openapi: 3.0.1
+info:
+  title: E-COMMERCE-API-DOCS
+  description: e-commerce-api-docs
+  version: 0.0.1
+servers:
+- url: https://localhost:8080
+tags: []
+paths:
+  /coupons:
+    post:
+      tags:
+      - coupons
+      summary: 쿠폰 발급 API
+      description: 쿠폰 발급 API
+      operationId: coupon-issue-
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: "#/components/schemas/CouponIssueRequest"
+            examples:
+              coupon-issue-200:
+                value: "{\r\n  \"userId\" : 1,\r\n  \"couponId\" : 1\r\n}"
+              coupon-issue-409:
+                value: "{\r\n  \"userId\" : 1,\r\n  \"couponId\" : 0\r\n}"
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CouponIssueResponse"
+              examples:
+                coupon-issue-200:
+                  value: "{\r\n  \"code\" : \"SUCCESS\",\r\n  \"message\" : \"OK\"\
+                    ,\r\n  \"data\" : {\r\n    \"couponIssueId\" : 10,\r\n    \"couponCode\"\
+                    \ : \"CODE123\",\r\n    \"couponId\" : 1,\r\n    \"issueDt\" :\
+                    \ \"Thu Jul 17 16:16:07 UTC 2025\",\r\n    \"expireDt\" : \"Thu\
+                    \ Jul 17 19:23:19 UTC 2025\"\r\n  }\r\n}"
+        "409":
+          description: "409"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResposne"
+              examples:
+                coupon-issue-409:
+                  value: "{\r\n  \"code\" : \"COUPON_SOLD_OUT\",\r\n  \"message\"\
+                    \ : \"COUPON_SOLD_OUT\",\r\n  \"data\" : null\r\n}"
+  /orders:
+    post:
+      tags:
+      - orders
+      summary: 주문 생성 요청 API
+      description: 주문 생성 요청 API
+      operationId: order-create-
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: "#/components/schemas/OrderCreateRequest"
+            examples:
+              order-create-200:
+                value: "{\r\n  \"orderId\" : \"UUID123\",\r\n  \"items\" : [ {\r\n\
+                  \    \"productLineId\" : 10,\r\n    \"linePrice\" : 200,\r\n   \
+                  \ \"quantity\" : 2\r\n  } ],\r\n  \"couponCode\" : null\r\n}"
+              order-create-409:
+                value: "{\r\n  \"orderId\" : \"BADID\",\r\n  \"items\" : [ {\r\n \
+                  \   \"productLineId\" : 10,\r\n    \"linePrice\" : 200,\r\n    \"\
+                  quantity\" : 2\r\n  } ],\r\n  \"couponCode\" : null\r\n}"
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderCreateResponse"
+              examples:
+                order-create-200:
+                  value: "{\r\n  \"code\" : \"SUCCESS\",\r\n  \"message\" : \"OK\"\
+                    ,\r\n  \"data\" : {\r\n    \"orderId\" : \"UUID123\",\r\n    \"\
+                    items\" : [ {\r\n      \"productLineId\" : 11,\r\n      \"linePrice\"\
+                    \ : 200.0,\r\n      \"couponYN\" : \"N\",\r\n      \"discountPrice\"\
+                    \ : null,\r\n      \"quantity\" : 2,\r\n      \"orderStatus\"\
+                    \ : \"O_CMPL\"\r\n    }, {\r\n      \"productLineId\" : 12,\r\n\
+                    \      \"linePrice\" : 300.0,\r\n      \"couponYN\" : \"N\",\r\
+                    \n      \"discountPrice\" : null,\r\n      \"quantity\" : 1,\r\
+                    \n      \"orderStatus\" : \"O_CMPL\"\r\n    } ],\r\n    \"totalPrice\"\
+                    \ : 700.0,\r\n    \"orderDt\" : \"Thu Jul 17 16:16:07 UTC 2025\"\
+                    ,\r\n    \"orderStatus\" : \"O_CMPL\"\r\n  }\r\n}"
+        "409":
+          description: "409"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                order-create-409:
+                  value: "{\r\n  \"code\" : \"INVALID_ORDER_ID\",\r\n  \"message\"\
+                    \ : \"INVALID_ORDER_ID\",\r\n  \"data\" : null\r\n}"
+  /orders/key:
+    get:
+      tags:
+      - orders
+      summary: 주문 번호 생성 요청 API
+      description: 주문 번호 생성 요청 API
+      operationId: order-key-200
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderKeyResponse"
+              examples:
+                order-key-200:
+                  value: "{\r\n  \"code\" : \"SUCCESS\",\r\n  \"message\" : \"OK\"\
+                    ,\r\n  \"data\" : {\r\n    \"orderId\" : \"e797bff6-f417-4e86-8088-42a8c3fcf63d\"\
+                    \r\n  }\r\n}"
+  /payments:
+    post:
+      tags:
+      - payments
+      summary: 결제 요청 API
+      description: 결제 요청 API
+      operationId: payment-
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: "#/components/schemas/PaymentRequest"
+            examples:
+              payment-200:
+                value: "{\r\n  \"orderId\" : \"UUID123\"\r\n}"
+              payment-400:
+                value: "{\r\n  \"orderId\" : \"LOWFUNDS\"\r\n}"
+              payment-409:
+                value: "{\r\n  \"orderId\" : \"OUTOFSTOCK\"\r\n}"
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentResponse"
+              examples:
+                payment-200:
+                  value: "{\r\n  \"code\" : \"SUCCESS\",\r\n  \"message\" : \"OK\"\
+                    ,\r\n  \"data\" : {\r\n    \"paymentId\" : 1,\r\n    \"orderId\"\
+                    \ : \"UUID123\",\r\n    \"totalPrice\" : 700.0,\r\n    \"paymentDt\"\
+                    \ : \"Thu Jul 17 16:16:07 UTC 2025\",\r\n    \"paymentStatus\"\
+                    \ : \"P_CMPL\"\r\n  }\r\n}"
+        "400":
+          description: "400"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                payment-400:
+                  value: "{\r\n  \"code\" : \"INSUFFICIENT_FUNDS\",\r\n  \"message\"\
+                    \ : \"INSUFFICIENT_FUNDS\",\r\n  \"data\" : null\r\n}"
+        "409":
+          description: "409"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                payment-409:
+                  value: "{\r\n  \"code\" : \"OUT_OF_STOCK\",\r\n  \"message\" : \"\
+                    OUT_OF_STOCK\",\r\n  \"data\" : null\r\n}"
+  /points/{userId}:
+    get:
+      tags:
+      - points
+      summary: 잔액 조회 API
+      description: 잔액 조회 API
+      operationId: balance-inquiry-
+      parameters:
+      - name: userId
+        in: path
+        description: 유저 식별자
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BalanceInquiryResponse"
+              examples:
+                balance-inquiry-200:
+                  value: "{\r\n  \"code\" : \"SUCCESS\",\r\n  \"message\" : \"OK\"\
+                    ,\r\n  \"data\" : {\r\n    \"userId\" : 1,\r\n    \"balance\"\
+                    \ : 12345\r\n  }\r\n}"
+        "404":
+          description: "404"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BalanceInquiryResponse"
+              examples:
+                balance-inquiry-404:
+                  value: "{\r\n  \"code\" : \"User Not Found\",\r\n  \"message\" :\
+                    \ \"User Not Found\",\r\n  \"data\" : null\r\n}"
+    patch:
+      tags:
+      - points
+      summary: 잔액 충전 API
+      description: 잔액 충전 API
+      operationId: balance-charge-
+      parameters:
+      - name: userId
+        in: path
+        description: 유저 식별자
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: "#/components/schemas/BalanceChargeRequest"
+            examples:
+              balance-charge-200:
+                value: "{\r\n  \"amount\" : 5000\r\n}"
+              balance-charge-400:
+                value: "{\r\n  \"amount\" : -100\r\n}"
+              balance-charge-404:
+                value: "{\r\n  \"amount\" : 100\r\n}"
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BalanceChargeResponse"
+              examples:
+                balance-charge-200:
+                  value: "{\r\n  \"code\" : \"SUCCESS\",\r\n  \"message\" : \"OK\"\
+                    ,\r\n  \"data\" : {\r\n    \"userId\" : 1,\r\n    \"newBalance\"\
+                    \ : 17345\r\n  }\r\n}"
+        "400":
+          description: "400"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                balance-charge-400:
+                  value: "{\r\n  \"code\" : \"INVALID_REQUEST\",\r\n  \"message\"\
+                    \ : \"amount must be over zero\",\r\n  \"data\" : null\r\n}"
+        "404":
+          description: "404"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                balance-charge-404:
+                  value: "{\r\n  \"code\" : \"User Not Found\",\r\n  \"message\" :\
+                    \ \"User Not Found\",\r\n  \"data\" : null\r\n}"
+  /products:
+    get:
+      tags:
+      - products
+      summary: 상품 조회 API
+      description: 상품 조회 API
+      operationId: product-list-200
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductListResponse"
+              examples:
+                product-list-200:
+                  value: "{\r\n  \"code\" : \"SUCCESS\",\r\n  \"message\" : \"OK\"\
+                    ,\r\n  \"data\" : {\r\n    \"products\" : [ {\r\n      \"productId\"\
+                    \ : 1,\r\n      \"name\" : \"사과\",\r\n      \"price\" : 1000.0\r\
+                    \n    }, {\r\n      \"productId\" : 2,\r\n      \"name\" : \"바\
+                    나나\",\r\n      \"price\" : 2000.0\r\n    } ]\r\n  }\r\n}"
+  /products/top:
+    get:
+      tags:
+      - products
+      summary: 인기 판매 상품 조회 API
+      description: 인기 판매 상품 조회 API
+      operationId: top-products-200
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TopProductRanking"
+              examples:
+                top-products-200:
+                  value: "{\r\n  \"code\" : \"SUCCESS\",\r\n  \"message\" : \"OK\"\
+                    ,\r\n  \"data\" : {\r\n    \"topProducts\" : [ {\r\n      \"productId\"\
+                    \ : 1,\r\n      \"productName\" : \"인기 1순위 상품\",\r\n      \"productPrice\"\
+                    \ : 100.0,\r\n      \"soldCount\" : 100\r\n    }, {\r\n      \"\
+                    productId\" : 2,\r\n      \"productName\" : \"인기 2순위 상품\",\r\n\
+                    \      \"productPrice\" : 80.0,\r\n      \"soldCount\" : 80\r\n\
+                    \    }, {\r\n      \"productId\" : 3,\r\n      \"productName\"\
+                    \ : \"인기 3순위 상품\",\r\n      \"productPrice\" : 60.0,\r\n     \
+                    \ \"soldCount\" : 60\r\n    }, {\r\n      \"productId\" : 4,\r\
+                    \n      \"productName\" : \"인기 4순위 상품\",\r\n      \"productPrice\"\
+                    \ : 40.0,\r\n      \"soldCount\" : 40\r\n    }, {\r\n      \"\
+                    productId\" : 5,\r\n      \"productName\" : \"인기 5순위 상품\",\r\n\
+                    \      \"productPrice\" : 20.0,\r\n      \"soldCount\" : 20\r\n\
+                    \    } ]\r\n  }\r\n}"
+  /products/{id}:
+    get:
+      tags:
+      - products
+      summary: 상품 상세 조회 API
+      description: 상품 상세 조회 API
+      operationId: product-detail-
+      parameters:
+      - name: id
+        in: path
+        description: 상품 식별자
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductDetailResponse"
+              examples:
+                product-detail-200:
+                  value: "{\"code\":\"SUCCESS\",\"message\":\"OK\",\"data\":{\"productId\"\
+                    :1,\"name\":\"사과\",\"description\":\"맛있는 사과\",\"price\":1000.0,\"\
+                    lines\":[{\"productLineId\":10,\"lineType\":\"기본\",\"linePrice\"\
+                    :1000.0,\"remaining\":10},{\"productLineId\":11,\"lineType\":\"\
+                    프리미엄\",\"linePrice\":2000.0,\"remaining\":5}]}}"
+        "404":
+          description: "404"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                product-detail-404:
+                  value: "{\r\n  \"code\" : \"PRODUCT_NOT_FOUND\",\r\n  \"message\"\
+                    \ : \"PRODUCT_NOT_FOUND\",\r\n  \"data\" : null\r\n}"
+components:
+  schemas:
+    ErrorResponse:
+      title: ErrorResponse
+      type: object
+      properties:
+        code:
+          type: string
+          description: 에러 코드 (INVALID_REQUEST)
+        message:
+          type: string
+          description: 에러 메시지
+    CouponIssueResponse:
+      title: CouponIssueResponse
+      type: object
+      properties:
+        code:
+          type: string
+          description: 응답 코드
+        data:
+          type: object
+          properties:
+            expireDt:
+              type: string
+              description: 만료 일자
+            couponIssueId:
+              type: number
+              description: 쿠폰 발급 식별자
+            couponId:
+              type: number
+              description: 발행 대상 쿠폰 식별자
+            couponCode:
+              type: string
+              description: 발급된 쿠폰 코드
+            issueDt:
+              type: string
+              description: 발급 일자
+        message:
+          type: string
+          description: 응답 메시지
+    CouponIssueRequest:
+      title: CouponIssueRequest
+      type: object
+      properties:
+        couponId:
+          type: number
+          description: 쿠폰 ID
+        userId:
+          type: number
+          description: 유저 ID
+    BalanceInquiryResponse:
+      title: BalanceInquiryResponse
+      type: object
+      properties:
+        code:
+          type: string
+          description: 에러 코드 (USER_NOT_FOUND)
+        message:
+          type: string
+          description: 에러 메시지
+    OrderCreateRequest:
+      title: OrderCreateRequest
+      type: object
+      properties:
+        orderId:
+          type: string
+          description: 주문 식별자
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              quantity:
+                type: number
+                description: 수량
+              linePrice:
+                type: number
+                description: 주문 시점 상품 라인 단일 금액
+              productLineId:
+                type: number
+                description: 상품 라인 ID
+    PaymentResponse:
+      title: PaymentResponse
+      type: object
+      properties:
+        code:
+          type: string
+          description: 응답 코드
+        data:
+          type: object
+          properties:
+            paymentDt:
+              type: string
+              description: 결제 일시
+            totalPrice:
+              type: number
+              description: 결제 금액
+            orderId:
+              type: string
+              description: 주문 ID
+            paymentId:
+              type: number
+              description: 결제 ID
+            paymentStatus:
+              type: string
+              description: 결제 상태
+        message:
+          type: string
+          description: 응답 메시지
+    BalanceChargeRequest:
+      title: BalanceChargeRequest
+      type: object
+      properties:
+        amount:
+          type: number
+          description: 잔액 희망 충전량
+    ProductDetailResponse:
+      title: ProductDetailResponse
+      type: object
+      properties:
+        code:
+          type: string
+          description: 응답 코드
+        data:
+          type: object
+          properties:
+            productId:
+              type: number
+              description: 상품 ID
+            price:
+              type: number
+              description: 가격
+            name:
+              type: string
+              description: 상품명
+            description:
+              type: string
+              description: 상품 설명
+            lines:
+              type: array
+              items:
+                type: object
+                properties:
+                  lineType:
+                    type: string
+                    description: 옵션 유형
+                  linePrice:
+                    type: number
+                    description: 옵션 가격
+                  remaining:
+                    type: number
+                    description: 남은 수량
+                  productLineId:
+                    type: number
+                    description: 옵션 ID
+        message:
+          type: string
+          description: 응답 메시지
+    OrderKeyResponse:
+      title: OrderKeyResponse
+      type: object
+      properties:
+        code:
+          type: string
+          description: 응답 코드
+        data:
+          type: object
+          properties:
+            orderId:
+              type: string
+              description: 발행된 주문 식별자
+        message:
+          type: string
+          description: 응답 메시지
+    OrderCreateResponse:
+      title: OrderCreateResponse
+      type: object
+      properties:
+        code:
+          type: string
+          description: 응답 코드
+        data:
+          type: object
+          properties:
+            orderDt:
+              type: string
+              description: 주문 일시
+            totalPrice:
+              type: number
+              description: 총 주문 금액
+            orderId:
+              type: string
+              description: 주문 ID
+            orderStatus:
+              type: string
+              description: 주문 상태
+            items:
+              type: array
+              items:
+                type: object
+                properties:
+                  quantity:
+                    type: number
+                    description: 수량
+                  couponYN:
+                    type: string
+                    description: 쿠폰 사용 여부
+                  linePrice:
+                    type: number
+                    description: 주문 시점 상품 라인 단일 금액
+                  orderStatus:
+                    type: string
+                    description: 주문 상태('Y')
+                  productLineId:
+                    type: number
+                    description: 상품 라인 ID
+        message:
+          type: string
+          description: 응답 메시지
+    ErrorResposne:
+      title: ErrorResposne
+      type: object
+      properties:
+        code:
+          type: string
+          description: 에러 코드 (COUPON_SOLD_OUT)
+        message:
+          type: string
+          description: 에러 메시지
+    TopProductRanking:
+      title: TopProductRanking
+      type: object
+      properties:
+        code:
+          type: string
+          description: 응답 코드
+        data:
+          type: object
+          properties:
+            topProducts:
+              type: array
+              items:
+                type: object
+                properties:
+                  soldCount:
+                    type: number
+                    description: 판매 수량
+                  productId:
+                    type: number
+                    description: 상품 ID
+                  productPrice:
+                    type: number
+                    description: 상품 대표 금액
+                  productName:
+                    type: string
+                    description: 상품 명
+        message:
+          type: string
+          description: 응답 메시지
+    BalanceChargeResponse:
+      title: BalanceChargeResponse
+      type: object
+      properties:
+        code:
+          type: string
+          description: 응답 코드
+        data:
+          type: object
+          properties:
+            newBalance:
+              type: number
+              description: 충전 후 잔액
+            userId:
+              type: number
+              description: 유저 ID
+        message:
+          type: string
+          description: 응답 메시지
+    PaymentRequest:
+      title: PaymentRequest
+      type: object
+      properties:
+        orderId:
+          type: string
+          description: 주문 식별자
+    ProductListResponse:
+      title: ProductListResponse
+      type: object
+      properties:
+        code:
+          type: string
+          description: 응답 코드
+        data:
+          type: object
+          properties:
+            products:
+              type: array
+              items:
+                type: object
+                properties:
+                  productId:
+                    type: number
+                    description: 상품 ID
+                  price:
+                    type: number
+                    description: 상품 가격
+                  name:
+                    type: string
+                    description: 상품명
+        message:
+          type: string
+          description: 응답 메시지
