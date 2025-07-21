@@ -1,10 +1,13 @@
-package kr.hhplus.be.server.domain.user;
+package kr.hhplus.be.server.domain.user.controller;
 
 import jakarta.validation.Valid;
 import kr.hhplus.be.server.common.api.ApiResponse;
 import kr.hhplus.be.server.domain.user.dto.BalanceChargeRequest;
 import kr.hhplus.be.server.domain.user.dto.BalanceChargeResponse;
 import kr.hhplus.be.server.domain.user.dto.BalanceInquiryResponse;
+import kr.hhplus.be.server.domain.user.entity.Point;
+import kr.hhplus.be.server.domain.user.facade.UserPointFacade;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,15 +15,18 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/points")
-public class BalanceController {
+@RequiredArgsConstructor
+public class PointController {
+
+    private final UserPointFacade userPointFacade;
 
     @GetMapping("/{userId}")
     public ResponseEntity<ApiResponse<BalanceInquiryResponse>> getBalance(@PathVariable Long userId) {
-        if(userId == 999){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found");
-        }
 
-        BalanceInquiryResponse data = new BalanceInquiryResponse(userId, 12345);
+        Point point = userPointFacade.getPoint(userId);
+
+        BalanceInquiryResponse data = new BalanceInquiryResponse(point.getUserId(), point.getBalance());
+
         return ResponseEntity.ok(ApiResponse.success(data));
     }
 
@@ -29,11 +35,10 @@ public class BalanceController {
             @PathVariable Long userId,
             @Valid @RequestBody BalanceChargeRequest req) {
 
-        if(userId == 999){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found");
-        }
+        Point point = userPointFacade.chargeUserPoint(userId, req.amount());
 
-        BalanceChargeResponse data = new BalanceChargeResponse(userId, 12345 + req.amount());
+        BalanceChargeResponse data = new BalanceChargeResponse(point.getUserId(), point.getBalance());
+
         return ResponseEntity.ok(ApiResponse.success(data));
     }
 }

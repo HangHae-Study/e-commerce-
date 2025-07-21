@@ -10,7 +10,7 @@ services:
       - MYSQL_PASSWORD=application
       - MYSQL_DATABASE=hhplus
     volumes:
-      - ./data/mysql/:/var/lib/mysql
+      - ~/Projects/data/mysql/:/var/lib/mysql
 
 networks:
   default:
