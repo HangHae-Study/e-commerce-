@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.domain.product.dto;
+package kr.hhplus.be.server.domain.product.application.dto;
 
 public record TopProductRanking(
         Long productId,

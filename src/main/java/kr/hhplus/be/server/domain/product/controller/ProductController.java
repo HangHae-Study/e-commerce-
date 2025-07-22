@@ -1,6 +1,7 @@
-package kr.hhplus.be.server.domain.product;
+package kr.hhplus.be.server.domain.product.controller;
 
 import kr.hhplus.be.server.common.api.ApiResponse;
+import kr.hhplus.be.server.domain.product.application.dto.*;
 import kr.hhplus.be.server.domain.product.dto.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
