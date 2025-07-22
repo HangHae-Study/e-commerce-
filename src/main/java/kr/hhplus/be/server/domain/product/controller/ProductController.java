@@ -1,8 +1,9 @@
 package kr.hhplus.be.server.domain.product.controller;
 
 import kr.hhplus.be.server.common.api.ApiResponse;
-import kr.hhplus.be.server.domain.product.application.dto.*;
-import kr.hhplus.be.server.domain.product.dto.*;
+import kr.hhplus.be.server.domain.product.application.facade.ProductDetailFacade;
+import kr.hhplus.be.server.domain.product.controller.apidto.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +13,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/products")
+@RequiredArgsConstructor
 public class ProductController {
+
+    private final ProductDetailFacade productDetailFacade;
 
     @GetMapping
     public ResponseEntity<ApiResponse<ProductListResponse>> listProducts() {
@@ -25,21 +29,7 @@ public class ProductController {
 
     @GetMapping("/{productId}")
     public ResponseEntity<ApiResponse<ProductDetailResponse>> getProduct(@PathVariable Long productId) {
-        if (productId < 1 || productId > 2) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PRODUCT_NOT_FOUND");
-        }
-        List<ProductLineItem> lines = List.of(
-                new ProductLineItem(10L, "기본", 1000, 10),
-                new ProductLineItem(11L, "프리미엄", 2000, 5)
-        );
-        ProductDetailResponse data = new ProductDetailResponse(
-                productId,
-                "사과",
-                "맛있는 사과",
-                1000,
-                lines
-        );
-        return ResponseEntity.ok(ApiResponse.success(data));
+        return ResponseEntity.ok(ApiResponse.success(productDetailFacade.getProductDetail(productId)));
     }
 
     @GetMapping("/top")
