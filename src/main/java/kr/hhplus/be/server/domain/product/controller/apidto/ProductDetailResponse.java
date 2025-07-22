@@ -1,11 +1,12 @@
-package kr.hhplus.be.server.domain.product.application.dto;
+package kr.hhplus.be.server.domain.product.controller.apidto;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public record ProductDetailResponse(
         Long productId,
         String name,
         String description,
-        double price,
+        BigDecimal price,
         List<ProductLineItem> lines
 ) {}
