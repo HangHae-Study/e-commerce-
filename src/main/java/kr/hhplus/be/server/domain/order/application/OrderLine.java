@@ -1,27 +1,35 @@
 package kr.hhplus.be.server.domain.order.application;
 
+import lombok.Builder;
+import lombok.Data;
+
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
+@Data
+@Builder
 public class OrderLine {
-    private final Long id;
-    private final Long productLineId;
-    private final int quantity;
-    private final BigDecimal price;
+    private final Long orderLineId;
+    private final String orderId;
 
-    public OrderLine(Long id, Long productLineId, int quantity, BigDecimal price) {
-        this.id = id;
-        this.productLineId = productLineId;
-        this.quantity = quantity;
-        this.price = price;
-    }
+    private final Long userId;
+    private final Long productId;
+    private final Long productLineId;
+
+    private final BigDecimal orderLinePrice;
+    private final int quantity;
+
+    private final String couponYn;
+    private final String couponCode;
+    private final BigDecimal discountPrice;
+
+    private final String status;
+    private final LocalDateTime orderDt;
+    private final LocalDateTime updateDt;
 
     public BigDecimal getSubtotal() {
-        return price.multiply(new BigDecimal(quantity));
+        return orderLinePrice.multiply(new BigDecimal(quantity));
     }
 
-    public Long getId() { return id; }
-    public Long getProductLineId() { return productLineId; }
-    public int getQuantity() { return quantity; }
-    public BigDecimal getPrice() { return price; }
 }
 

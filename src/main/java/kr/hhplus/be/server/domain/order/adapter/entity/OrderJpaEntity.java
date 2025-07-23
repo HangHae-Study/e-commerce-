@@ -27,13 +27,21 @@ public class OrderJpaEntity {
     private List<OrderLineJpaEntity> orderLines = new ArrayList<>();
 
     private LocalDateTime orderDt;
-    private String orderStatus;
+    private String status;
     private LocalDateTime updateDt;
 
 
     public Order toDomain() {
         List<OrderLine> lines = orderLines.stream().map(OrderLineJpaEntity::toDomain).toList();
-        return new Order(orderId, userId, totalPrice, lines, orderDt, orderStatus, updateDt);
+        return Order.builder()
+                .orderId(orderId)
+                .userId(userId)
+                .totalPrice(totalPrice)
+                .orderLines(lines)
+                .orderDt(orderDt)
+                .status(status)
+                .updateDt(updateDt)
+                .build();
     }
 
     public static OrderJpaEntity fromDomain(Order order) {
