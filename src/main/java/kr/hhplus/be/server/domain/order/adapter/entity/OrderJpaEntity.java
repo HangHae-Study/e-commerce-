@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 public class OrderJpaEntity {
     @Id
-    private String id;
+    private String orderId;
 
     private Long userId;
 
@@ -33,7 +33,7 @@ public class OrderJpaEntity {
 
     public Order toDomain() {
         List<OrderLine> lines = orderLines.stream().map(OrderLineJpaEntity::toDomain).toList();
-        return new Order(id, userId, totalPrice, lines, orderDt, orderStatus, updateDt);
+        return new Order(orderId, userId, totalPrice, lines, orderDt, orderStatus, updateDt);
     }
 
     public static OrderJpaEntity fromDomain(Order order) {

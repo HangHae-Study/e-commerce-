@@ -2,10 +2,14 @@ package kr.hhplus.be.server.domain.product.adapter.repository;
 
 import kr.hhplus.be.server.domain.product.application.ProductLine;
 import kr.hhplus.be.server.domain.product.application.repository.ProductLineRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
+@RequiredArgsConstructor
 public class ProductLineJpaRepositoryAdapter implements ProductLineRepository {
     @Override
     public Optional<ProductLine> findById(Long aLong) {

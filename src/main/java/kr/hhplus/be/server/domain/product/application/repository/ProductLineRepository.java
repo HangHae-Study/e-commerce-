@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
 public interface ProductLineRepository extends RepositoryPort<Long, ProductLine> {
 
     List<ProductLine> findByProductId(Long productId);

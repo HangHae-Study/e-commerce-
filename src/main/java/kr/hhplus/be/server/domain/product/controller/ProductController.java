@@ -20,11 +20,7 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<ProductListResponse>> listProducts() {
-        List<ProductSummary> products = List.of(
-                new ProductSummary(1L, "사과", 1000),
-                new ProductSummary(2L, "바나나", 2000)
-        );
-        return ResponseEntity.ok(ApiResponse.success(new ProductListResponse(products)));
+        return ResponseEntity.ok(ApiResponse.success(productDetailFacade.getAllProducts()));
     }
 
     @GetMapping("/{productId}")

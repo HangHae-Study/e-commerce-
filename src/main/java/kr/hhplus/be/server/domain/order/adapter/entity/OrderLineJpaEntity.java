@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class OrderLineJpaEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long orderLineId;
 
     private Long productId;
     private Long productLineId;
@@ -26,7 +26,7 @@ public class OrderLineJpaEntity {
     private OrderJpaEntity order;
 
     public OrderLine toDomain() {
-        return new OrderLine(id, productId, quantity, price);
+        return new OrderLine(orderLineId, productId, quantity, price);
     }
 
     public static OrderLineJpaEntity fromDomain(OrderLine line, OrderJpaEntity order) {

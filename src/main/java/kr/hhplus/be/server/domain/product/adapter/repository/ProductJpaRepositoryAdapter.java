@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.product.adapter.repository;
 
+import kr.hhplus.be.server.domain.product.adapter.entity.ProductJpaEntity;
 import kr.hhplus.be.server.domain.product.application.Product;
 import kr.hhplus.be.server.domain.product.application.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,17 +16,20 @@ public class ProductJpaRepositoryAdapter implements ProductRepository {
 
     @Override
     public Optional<Product> findById(Long aLong) {
-        return Optional.empty();
+        return productJpaRepository.findById(aLong).map(ProductJpaEntity::toDomain);
     }
 
     @Override
     public List<Product> findAll() {
-        return null;
+        return productJpaRepository.findAll().stream()
+                .map(ProductJpaEntity::toDomain)
+                .toList();
     }
 
     @Override
     public Product save(Product product) {
-        return null;
+        productJpaRepository.save(ProductJpaEntity.fromDomain(product));
+        return product;
     }
 
     @Override

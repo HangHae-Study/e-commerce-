@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.layered;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.hhplus.be.server.domain.product.application.Product;
 import kr.hhplus.be.server.domain.product.application.ProductLine;
 import kr.hhplus.be.server.domain.product.application.facade.ProductDetailFacade;
@@ -16,6 +17,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.web.servlet.MockMvc;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -25,6 +36,9 @@ import java.util.NoSuchElementException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class ProductTest {
 
@@ -46,7 +60,7 @@ public class ProductTest {
                 .build();
 
         final ProductLine productLine2 = ProductLine.builder()
-                .productLineId(1L)
+                .productLineId(2L)
                 .productId(1L)
                 .productName("맥북 14 Pro")
                 .productLinePrice(new BigDecimal("33000"))
@@ -153,6 +167,92 @@ public class ProductTest {
             assertThrows(NoSuchElementException.class,
                     () -> productDetailFacade.getProductDetail(productId));
         }
+    }
+
+
+    class RealProduct{
+        final Product product = Product.builder()
+                .productName("맥북 14 Pro")
+                .productPrice(new BigDecimal("32000"))
+                .updateDt(LocalDateTime.now())
+                .build();
+
+        final ProductLine productLine1 = ProductLine.builder()
+                .productLineId(null)
+                .productId(1L)
+                .productName("맥북 14 Pro")
+                .productLinePrice(new BigDecimal("31000"))
+                .productLineType("m2 그레이 실버")
+                .updateDt(LocalDateTime.now())
+                .build();
+
+        final ProductLine productLine2 = ProductLine.builder()
+                .productLineId(null)
+                .productId(1L)
+                .productName("맥북 14 Pro")
+                .productLinePrice(new BigDecimal("33000"))
+                .productLineType("m3 스페이스 블랙")
+                .updateDt(LocalDateTime.now())
+                .build();
+    }
+
+    @Nested
+    @SpringBootTest
+    @AutoConfigureMockMvc
+    @Testcontainers
+    class ProductControllerTest{
+
+
+        @Autowired
+        private MockMvc mockMvc;
+
+        @Autowired
+        private ObjectMapper objectMapper;
+
+        @Autowired
+        private ProductRepository productRepository;
+
+        @Autowired
+        private ProductLineRepository productLineRepository;
+
+        @BeforeEach
+        void setup(){
+            RealProduct realProduct = new RealProduct();
+            productRepository.save(realProduct.product);
+            productLineRepository.save(realProduct.productLine1);
+            productLineRepository.save(realProduct.productLine2);
+        }
+
+        @Test
+        void 상품_목록_조회_요청() throws Exception{
+            mockMvc.perform(get("/products"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.products.length()").value(2))
+                    .andExpect(jsonPath("$.data.products[0].productId").value(1))
+                    .andExpect(jsonPath("$.data.products[0].name").value("맥북 14 Pro"));
+        }
+
+        @Test
+        void 상품_상세_조회_요청() throws Exception{
+            mockMvc.perform(get("/products/{productId}", 1L))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.productId").value(1))
+                    .andExpect(jsonPath("$.data.name").value("맥북 14 Pro"))
+                    .andExpect(jsonPath("$.data.lines.length()").value(1))
+                    .andExpect(jsonPath("$.data.lines[0].productId").value(1))
+                    .andExpect(jsonPath("$.data.lines[0].lineType").value("m2 그레이 실버"));
+        }
+
+        /*
+        @Test
+        void 존재하지_않는_상품_조회_요청() throws Exception{
+            mockMvc.perform(get("/products"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.products.length()").value(1))
+                    .andExpect(jsonPath("$.data.products[0].productId").value(1))
+                    .andExpect(jsonPath("$.data.products[0].name").value("맥북 14 Pro"));
+        }
+           */
     }
 
 }

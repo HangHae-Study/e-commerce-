@@ -41,10 +41,14 @@ public class ProductJpaEntity {
 
     public static ProductJpaEntity fromDomain(Product product){
         ProductJpaEntity entity = new ProductJpaEntity();
-        entity.productId = product.getProductId();
         entity.productName = product.getProductName();
         entity.productPrice = product.getProductPrice();
         entity.updateDt = product.getUpdateDt();
+
+        if(product.getProductId() != null){
+            entity.productId = product.getProductId();
+        }
+
         return entity;
     }
 }
