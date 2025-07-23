@@ -54,4 +54,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiResponse<Void>> handleNoSuchElement(IllegalStateException ex) {
+        String errors = ex.getMessage();
+        ApiResponse<Void> body = new ApiResponse<>("CONFLICT", errors, null);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+    }
+
 }

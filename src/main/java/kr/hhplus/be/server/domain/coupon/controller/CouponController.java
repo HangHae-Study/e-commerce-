@@ -1,7 +1,9 @@
-package kr.hhplus.be.server.domain.coupon;
+package kr.hhplus.be.server.domain.coupon.controller;
 
 import kr.hhplus.be.server.common.api.ApiResponse;
+import kr.hhplus.be.server.domain.coupon.application.service.CouponService;
 import kr.hhplus.be.server.domain.coupon.dto.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,22 +13,15 @@ import java.util.Date;
 
 @RestController
 @RequestMapping("/coupons")
+@RequiredArgsConstructor
 public class CouponController {
+
+    private final CouponService couponService;
 
     @PostMapping
     public ResponseEntity<ApiResponse<CouponIssueResponse>> issueCoupon(
             @RequestBody CouponIssueRequest req) {
-        if (req.couponId() == 0) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "COUPON_SOLD_OUT");
-        }
-        return ResponseEntity.ok(ApiResponse.success(
-                new CouponIssueResponse(
-                        10L,
-                        "CODE123",
-                        1L,
-                        String.valueOf(new Date()),
-                        String.valueOf(new Date(new Date().getTime() + (long) ( 130 * 60 * 60 * 24 ))))
-                )
-        );
+
+        return ResponseEntity.ok(ApiResponse.success(couponService.couponIssueRes(req)));
     }
 }

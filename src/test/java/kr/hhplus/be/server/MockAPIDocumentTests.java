@@ -9,7 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.Schema;
-import kr.hhplus.be.server.domain.coupon.CouponController;
+import kr.hhplus.be.server.domain.coupon.controller.CouponController;
 import kr.hhplus.be.server.domain.order.controller.OrderController;
 import kr.hhplus.be.server.domain.payment.PaymentController;
 import kr.hhplus.be.server.domain.product.controller.ProductController;
