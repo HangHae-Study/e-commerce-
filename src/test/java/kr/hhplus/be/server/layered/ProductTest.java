@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -37,8 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class ProductTest {
 
@@ -183,6 +183,7 @@ public class ProductTest {
                 .productName("맥북 14 Pro")
                 .productLinePrice(new BigDecimal("31000"))
                 .productLineType("m2 그레이 실버")
+                .remaining(10L)
                 .updateDt(LocalDateTime.now())
                 .build();
 
@@ -192,6 +193,7 @@ public class ProductTest {
                 .productName("맥북 14 Pro")
                 .productLinePrice(new BigDecimal("33000"))
                 .productLineType("m3 스페이스 블랙")
+                .remaining(5L)
                 .updateDt(LocalDateTime.now())
                 .build();
     }
@@ -227,7 +229,7 @@ public class ProductTest {
         void 상품_목록_조회_요청() throws Exception{
             mockMvc.perform(get("/products"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data.products.length()").value(2))
+                    .andExpect(jsonPath("$.data.products.length()").value(1))
                     .andExpect(jsonPath("$.data.products[0].productId").value(1))
                     .andExpect(jsonPath("$.data.products[0].name").value("맥북 14 Pro"));
         }
@@ -238,21 +240,23 @@ public class ProductTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.data.productId").value(1))
                     .andExpect(jsonPath("$.data.name").value("맥북 14 Pro"))
-                    .andExpect(jsonPath("$.data.lines.length()").value(1))
-                    .andExpect(jsonPath("$.data.lines[0].productId").value(1))
+                    .andExpect(jsonPath("$.data.lines.length()").value(2))
+                    .andExpect(jsonPath("$.data.lines[0].productLineId").value(1))
                     .andExpect(jsonPath("$.data.lines[0].lineType").value("m2 그레이 실버"));
         }
 
-        /*
+
         @Test
-        void 존재하지_않는_상품_조회_요청() throws Exception{
-            mockMvc.perform(get("/products"))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data.products.length()").value(1))
-                    .andExpect(jsonPath("$.data.products[0].productId").value(1))
-                    .andExpect(jsonPath("$.data.products[0].name").value("맥북 14 Pro"));
+        void 존재하지_않는_상품_조회_요청() throws Exception{Long nonExistentProductId = 9999L;
+
+            // when & then
+            mockMvc.perform(get("/products/{productId}", nonExistentProductId))
+                    .andExpect(status().isNotFound())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(jsonPath("$.code").value("NOT_FOUND"))  // ApiResponse 구조에 따라 다름
+                    .andExpect(jsonPath("$.message").exists());
         }
-           */
+
     }
 
 }

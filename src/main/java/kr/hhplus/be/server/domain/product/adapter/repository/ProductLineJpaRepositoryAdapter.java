@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.product.adapter.repository;
 
+import kr.hhplus.be.server.domain.product.adapter.entity.ProductLineJpaEntity;
 import kr.hhplus.be.server.domain.product.application.ProductLine;
 import kr.hhplus.be.server.domain.product.application.repository.ProductLineRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,9 +12,11 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class ProductLineJpaRepositoryAdapter implements ProductLineRepository {
+    private final ProductLineJpaRepository productLineJpaRepository;
+
     @Override
     public Optional<ProductLine> findById(Long aLong) {
-        return Optional.empty();
+        return productLineJpaRepository.findById(aLong).map(ProductLineJpaEntity::toDomain);
     }
 
     @Override
@@ -23,7 +26,8 @@ public class ProductLineJpaRepositoryAdapter implements ProductLineRepository {
 
     @Override
     public ProductLine save(ProductLine productLine) {
-        return null;
+        productLineJpaRepository.save(ProductLineJpaEntity.fromDomain(productLine));
+        return productLine;
     }
 
     @Override
@@ -33,6 +37,8 @@ public class ProductLineJpaRepositoryAdapter implements ProductLineRepository {
 
     @Override
     public List<ProductLine> findByProductId(Long productId) {
-        return null;
+        return productLineJpaRepository.findProductLineJpaEntitiesByProductId(productId)
+                .stream().map(ProductLineJpaEntity::toDomain
+                ).toList();
     }
 }

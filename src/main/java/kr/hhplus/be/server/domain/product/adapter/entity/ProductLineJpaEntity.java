@@ -48,13 +48,17 @@ public class ProductLineJpaEntity {
 
     public static ProductLineJpaEntity fromDomain(ProductLine line) {
         ProductLineJpaEntity entity = new ProductLineJpaEntity();
-        entity.productLineId = line.getProductLineId();
         entity.productId = line.getProductId();
         entity.productName = line.getProductName();
         entity.productLinePrice = line.getProductLinePrice();
         entity.productLineType = line.getProductLineType();
         entity.remaining = line.getRemaining();
         entity.updateDt = line.getUpdateDt();
+
+        if(line.getProductLineId() != null){
+            entity.productLineId = line.getProductLineId();
+        }
+
         return entity;
     }
 }
