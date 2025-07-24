@@ -12,14 +12,14 @@ import java.util.List;
 @Data
 @Builder(toBuilder = true)
 public class Order {
-    private final String orderId;
-    private final Long userId;
-    private final BigDecimal totalPrice;
+    private String orderId;
+    private Long userId;
+    private BigDecimal totalPrice;
     @Singular
-    private final List<OrderLine> orderLines;
-    private final LocalDateTime orderDt;
-    private final String status;
-    private final LocalDateTime updateDt;
+    private List<OrderLine> orderLines;
+    private LocalDateTime orderDt;
+    private String status;
+    private LocalDateTime updateDt;
 
     public static Order create(OrderCreateRequest req){
         List<OrderLine> ol = req.items().stream()
@@ -34,5 +34,9 @@ public class Order {
                 .status("O_MAKE")
                 .updateDt(LocalDateTime.now())
                 .build();
+    }
+
+    public void complete() {
+        setStatus("O_CMPL");
     }
 }

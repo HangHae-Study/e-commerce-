@@ -14,6 +14,14 @@ public class ProductLine {
     private final String productName;
     private final BigDecimal productLinePrice;
     private final String productLineType;
-    private final Long remaining;
+    private Long remaining;
     private final LocalDateTime updateDt;
+
+    public void decreaseStock(Long quantity){
+        remaining -= quantity;
+    }
+
+    public void increaseStock(Long quantity){
+        remaining += quantity;
+    }
 }

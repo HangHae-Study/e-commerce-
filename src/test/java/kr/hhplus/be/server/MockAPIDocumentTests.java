@@ -11,7 +11,7 @@ import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.Schema;
 import kr.hhplus.be.server.domain.coupon.controller.CouponController;
 import kr.hhplus.be.server.domain.order.controller.OrderController;
-import kr.hhplus.be.server.domain.payment.PaymentController;
+import kr.hhplus.be.server.domain.payment.controller.PaymentController;
 import kr.hhplus.be.server.domain.product.controller.ProductController;
 import kr.hhplus.be.server.domain.user.controller.PointController;
 import org.junit.jupiter.api.DisplayName;

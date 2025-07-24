@@ -21,5 +21,10 @@ public class UserPointFacade {
         return pointService.charge(userId, amount);
     }
 
+    public Point updateUserPoint(Long userId, Object amount){
+        Users user =  userService.getUser(userId);
+        return pointService.use(userId, amount);
+    }
+
 
 }

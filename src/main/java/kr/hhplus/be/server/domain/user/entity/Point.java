@@ -1,15 +1,10 @@
 package kr.hhplus.be.server.domain.user.entity;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
 import lombok.Data;
-import org.springframework.data.repository.query.ParameterOutOfBoundsException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.math.BigDecimal;
-import java.text.NumberFormat;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Data
 public class Point {
@@ -36,6 +31,13 @@ public class Point {
         this.balance = this.balance.add(amt);
 
         return this;
+    }
+
+    public void use(Object amount){
+        BigDecimal amt = new BigDecimal(amount.toString());
+
+        this.balance = this.balance.subtract(amt);
+
     }
 
 
