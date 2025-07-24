@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -65,6 +66,23 @@ public class CouponService {
                 couponIssue.getUpdateDt().toString(),
                 couponIssue.getExpireDate().toString()
         );
+    }
+
+    public CouponIssue getCouponIssue(Long userId, String couponCode){
+        if(couponCode.isEmpty() || couponCode.isBlank()){
+            return null;
+        }
+
+        CouponIssue ci = couponIssueRepository.findByCouponCode(couponCode);
+
+        if(!Objects.equals(userId, ci.getUserId()) || !ci.isValid()){
+            throw new IllegalStateException("유효하지 않은 쿠폰 입니다");
+        }
+        return ci;
+    }
+
+    public void couponAppliedByOrder(CouponIssue couponIssue){
+
     }
 
 }

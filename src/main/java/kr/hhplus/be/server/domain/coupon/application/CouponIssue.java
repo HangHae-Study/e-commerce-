@@ -19,4 +19,9 @@ public class CouponIssue {
     private BigDecimal discountRate;
     private LocalDateTime expireDate;
     private LocalDateTime updateDt;
+
+    public boolean isValid(){
+        return expireDate.isAfter(LocalDateTime.now()) || couponValid.equals("N");
+    }
+
 }

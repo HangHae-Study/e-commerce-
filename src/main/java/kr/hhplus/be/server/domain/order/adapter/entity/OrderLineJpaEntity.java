@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.order.application.OrderLine;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -33,6 +34,13 @@ public class OrderLineJpaEntity {
 
     private String status;
     private LocalDateTime orderDt;
+
+    @UpdateTimestamp
+    @Column(
+            name = "update_dt",
+            nullable = false,
+            columnDefinition = "DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+    )
     private LocalDateTime updateDt;
 
     public OrderLine toDomain() {

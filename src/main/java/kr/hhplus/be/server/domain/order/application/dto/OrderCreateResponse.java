@@ -1,20 +1,21 @@
 package kr.hhplus.be.server.domain.order.application.dto;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public record OrderCreateResponse(
         String orderId,
         List<OrderResItem> items,
-        double totalPrice,
+        BigDecimal totalPrice,
         String orderDt,
         String orderStatus
     ) {
 
     public record OrderResItem(
             Long productLineId,
-            Double linePrice,
+            BigDecimal linePrice,
             String couponYN,
-            Double discountPrice,
+            BigDecimal discountPrice,
             int quantity,
             String orderStatus
     ) {}

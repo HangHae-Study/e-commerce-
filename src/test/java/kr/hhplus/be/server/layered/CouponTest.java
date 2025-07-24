@@ -47,7 +47,7 @@ class CouponControllerTest {
         Coupon couponDomain = Coupon.builder()
                 .totalIssued(5L)
                 .remaining(5L)
-                .discountRate(new BigDecimal("0.20"))
+                .discountRate(new BigDecimal("20"))
                 .expireDate(LocalDateTime.now().plusDays(7))
                 .updateDt(LocalDateTime.now())
                 .build();

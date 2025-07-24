@@ -4,6 +4,8 @@ import kr.hhplus.be.server.common.api.ApiResponse;
 import kr.hhplus.be.server.domain.order.application.dto.OrderCreateRequest;
 import kr.hhplus.be.server.domain.order.application.dto.OrderCreateResponse;
 import kr.hhplus.be.server.domain.order.application.dto.OrderKeyResponse;
+import kr.hhplus.be.server.domain.order.application.facade.OrderFacade;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +17,9 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/orders")
+@RequiredArgsConstructor
 public class OrderController {
+    private final OrderFacade orderFacade;
 
     @GetMapping("/key")
     public ResponseEntity<ApiResponse<OrderKeyResponse>> issueOrderKey() {
@@ -26,26 +30,8 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<ApiResponse<OrderCreateResponse>> createOrder(
             @RequestBody OrderCreateRequest req) {
-        if (req.orderId().startsWith("BAD")) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "INVALID_ORDER_ID");
-        }
 
-        List<OrderCreateResponse.OrderResItem> items = List.of(
-                new OrderCreateResponse.OrderResItem(
-                        11L, 200.0, "N", null,2, "O_CMPL")
-                ,
-                new OrderCreateResponse.OrderResItem(
-                        12L, 300.0, "N", null,1, "O_CMPL")
-
-        );
-
-        OrderCreateResponse response = new OrderCreateResponse(
-                req.orderId(),
-                items,
-                700.0,
-                String.valueOf(new Date()),
-                "O_CMPL"
-        );
+        OrderCreateResponse response = orderFacade.createOrder(req);
 
         return ResponseEntity.ok(ApiResponse.success(response));
     }

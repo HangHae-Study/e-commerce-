@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.layered;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.hhplus.be.server.TestData.TestInstance;
 import kr.hhplus.be.server.domain.product.application.Product;
 import kr.hhplus.be.server.domain.product.application.ProductLine;
 import kr.hhplus.be.server.domain.product.application.facade.ProductDetailFacade;
@@ -22,11 +23,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
@@ -34,6 +31,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import static kr.hhplus.be.server.TestData.TestInstance.MockProduct.getMockProduct;
+import static kr.hhplus.be.server.TestData.TestInstance.PersistProduct.getPersistProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -41,34 +40,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class ProductTest {
-
-    class MockProduct{
-        final Product product = Product.builder()
-                .productId(1L)
-                .productName("맥북 14 Pro")
-                .productPrice(new BigDecimal("32000"))
-                .updateDt(LocalDateTime.now())
-                .build();
-
-        final ProductLine productLine1 = ProductLine.builder()
-                .productLineId(1L)
-                .productId(1L)
-                .productName("맥북 14 Pro")
-                .productLinePrice(new BigDecimal("31000"))
-                .productLineType("m2 그레이 실버")
-                .updateDt(LocalDateTime.now())
-                .build();
-
-        final ProductLine productLine2 = ProductLine.builder()
-                .productLineId(2L)
-                .productId(1L)
-                .productName("맥북 14 Pro")
-                .productLinePrice(new BigDecimal("33000"))
-                .productLineType("m3 스페이스 블랙")
-                .updateDt(LocalDateTime.now())
-                .build();
-    }
-
 
     @ExtendWith(MockitoExtension.class)
     @DisplayName("상품 조회 Mock 테스트")
@@ -88,7 +59,7 @@ public class ProductTest {
 
         @Test
         void 전체_상품_조회(){
-            MockProduct mockProduct = new MockProduct();
+            TestInstance.MockProduct mockProduct = getMockProduct();
             when(productRepository.findAll()).thenReturn(List.of(mockProduct.product));
 
             List<Product> result = productService.getAllProducts();
@@ -100,7 +71,7 @@ public class ProductTest {
 
         @Test
         void 상품_상세내역_조회(){
-            MockProduct mockProduct = new MockProduct();
+            TestInstance.MockProduct mockProduct = getMockProduct();
             Long productId = mockProduct.product.getProductId();
             List<ProductLine> lineList = List.of(mockProduct.productLine1, mockProduct.productLine2);
 
@@ -135,7 +106,7 @@ public class ProductTest {
         }
         @Test
         void 상품_상품라인_조합_조회_테스트(){
-            MockProduct mockProduct = new MockProduct();
+            TestInstance.MockProduct mockProduct = getMockProduct();
             Product product = mockProduct.product;
             List<ProductLine> lineList = List.of(mockProduct.productLine1, mockProduct.productLine2);
             Long productId = product.getProductId();
@@ -169,35 +140,6 @@ public class ProductTest {
         }
     }
 
-
-    class RealProduct{
-        final Product product = Product.builder()
-                .productName("맥북 14 Pro")
-                .productPrice(new BigDecimal("32000"))
-                .updateDt(LocalDateTime.now())
-                .build();
-
-        final ProductLine productLine1 = ProductLine.builder()
-                .productLineId(null)
-                .productId(1L)
-                .productName("맥북 14 Pro")
-                .productLinePrice(new BigDecimal("31000"))
-                .productLineType("m2 그레이 실버")
-                .remaining(10L)
-                .updateDt(LocalDateTime.now())
-                .build();
-
-        final ProductLine productLine2 = ProductLine.builder()
-                .productLineId(null)
-                .productId(1L)
-                .productName("맥북 14 Pro")
-                .productLinePrice(new BigDecimal("33000"))
-                .productLineType("m3 스페이스 블랙")
-                .remaining(5L)
-                .updateDt(LocalDateTime.now())
-                .build();
-    }
-
     @Nested
     @SpringBootTest
     @AutoConfigureMockMvc
@@ -219,7 +161,7 @@ public class ProductTest {
 
         @BeforeEach
         void setup(){
-            RealProduct realProduct = new RealProduct();
+            TestInstance.PersistProduct realProduct = getPersistProduct();
             productRepository.save(realProduct.product);
             productLineRepository.save(realProduct.productLine1);
             productLineRepository.save(realProduct.productLine2);

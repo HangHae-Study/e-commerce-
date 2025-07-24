@@ -5,6 +5,7 @@ import kr.hhplus.be.server.domain.order.application.Order;
 import kr.hhplus.be.server.domain.order.application.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,25 +13,31 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class OrderJpaRepositoryAdapter implements OrderRepository {
+
     private final OrderJpaRepository jpaRepository;
 
     @Override
-    public Optional findById(String orderId) {
-        return Optional.empty();
+    public Optional<Order> findById(String orderId) {
+        return jpaRepository.findById(orderId)
+                .map(OrderJpaEntity::toDomain);
     }
 
     @Override
-    public List findAll() {
-        return List.of();
+    public List<Order> findAll() {
+        return jpaRepository.findAll().stream()
+                .map(OrderJpaEntity::toDomain)
+                .toList();
     }
 
     @Override
-    public Order save(Order orders) {
-        return null;
+    public Order save(Order order) {
+        OrderJpaEntity entity = OrderJpaEntity.fromDomain(order);
+        OrderJpaEntity saved = jpaRepository.save(entity);
+        return saved.toDomain();
     }
 
     @Override
     public void deleteById(String orderId) {
-
+        jpaRepository.deleteById(orderId);
     }
 }

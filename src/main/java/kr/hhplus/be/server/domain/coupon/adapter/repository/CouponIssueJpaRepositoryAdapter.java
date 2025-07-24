@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Repository
@@ -41,4 +42,10 @@ public class CouponIssueJpaRepositoryAdapter implements CouponIssueRepository {
 
     }
 
+    @Override
+    public CouponIssue findByCouponCode(String code) {
+        CouponIssueJpaEntity entity = couponIssueJpaRepository.findCouponIssueJpaEntitiesByCouponCode(code)
+                .orElseThrow(() -> new NoSuchElementException("발급(유효)되지 않은 쿠폰입니다."));
+        return entity.toDomain();
+    }
 }
