@@ -2,16 +2,16 @@ package kr.hhplus.be.server.layered;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.hhplus.be.server.domain.user.dto.BalanceChargeRequest;
-import kr.hhplus.be.server.domain.user.entity.Point;
-import kr.hhplus.be.server.domain.user.entity.Users;
-import kr.hhplus.be.server.domain.user.facade.UserPointFacade;
-import kr.hhplus.be.server.domain.user.repository.InMemoryPointRepository;
-import kr.hhplus.be.server.domain.user.repository.InMemoryUserRepository;
-import kr.hhplus.be.server.domain.user.repository.PointRepository;
-import kr.hhplus.be.server.domain.user.repository.UserRepository;
-import kr.hhplus.be.server.domain.user.service.PointService;
-import kr.hhplus.be.server.domain.user.service.UserService;
+import kr.hhplus.be.server.domain.user.controller.dto.BalanceChargeRequest;
+import kr.hhplus.be.server.domain.user.application.Point;
+import kr.hhplus.be.server.domain.user.application.Users;
+import kr.hhplus.be.server.domain.user.application.facade.UserPointFacade;
+import kr.hhplus.be.server.domain.user.adapter.repository.InMemoryPointRepository;
+import kr.hhplus.be.server.domain.user.adapter.repository.InMemoryUserRepository;
+import kr.hhplus.be.server.domain.user.application.repository.PointRepository;
+import kr.hhplus.be.server.domain.user.application.repository.UserRepository;
+import kr.hhplus.be.server.domain.user.application.service.PointService;
+import kr.hhplus.be.server.domain.user.application.service.UserService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;

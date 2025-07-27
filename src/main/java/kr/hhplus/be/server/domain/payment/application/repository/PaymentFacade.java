@@ -2,7 +2,6 @@ package kr.hhplus.be.server.domain.payment.application.repository;
 
 import kr.hhplus.be.server.domain.order.application.Order;
 import kr.hhplus.be.server.domain.order.application.OrderLine;
-import kr.hhplus.be.server.domain.order.application.repository.OrderLineRepository;
 import kr.hhplus.be.server.domain.order.application.service.OrderService;
 import kr.hhplus.be.server.domain.payment.application.Payment;
 import kr.hhplus.be.server.domain.payment.application.dto.PaymentRequest;
@@ -10,13 +9,12 @@ import kr.hhplus.be.server.domain.payment.application.dto.PaymentResponse;
 import kr.hhplus.be.server.domain.payment.application.service.PaymentService;
 import kr.hhplus.be.server.domain.product.application.ProductLine;
 import kr.hhplus.be.server.domain.product.application.service.ProductLineService;
-import kr.hhplus.be.server.domain.user.entity.Point;
-import kr.hhplus.be.server.domain.user.facade.UserPointFacade;
+import kr.hhplus.be.server.domain.user.application.Point;
+import kr.hhplus.be.server.domain.user.application.facade.UserPointFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 

@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.domain.user.dto;
+package kr.hhplus.be.server.domain.user.controller.dto;
 
 import jakarta.validation.constraints.Min;
 

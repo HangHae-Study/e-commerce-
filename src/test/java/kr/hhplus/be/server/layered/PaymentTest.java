@@ -2,23 +2,19 @@ package kr.hhplus.be.server.layered;
 
 import kr.hhplus.be.server.TestData.TestInstance;
 import kr.hhplus.be.server.domain.order.application.Order;
-import kr.hhplus.be.server.domain.order.application.OrderLine;
-import kr.hhplus.be.server.domain.order.application.dto.OrderCreateRequest;
 import kr.hhplus.be.server.domain.order.application.repository.OrderRepository;
 import kr.hhplus.be.server.domain.order.application.service.OrderService;
 import kr.hhplus.be.server.domain.payment.application.dto.PaymentRequest;
 import kr.hhplus.be.server.domain.payment.application.dto.PaymentResponse;
 import kr.hhplus.be.server.domain.payment.application.repository.PaymentFacade;
 import kr.hhplus.be.server.domain.payment.application.repository.PaymentRepository;
-import kr.hhplus.be.server.domain.product.application.Product;
-import kr.hhplus.be.server.domain.product.application.ProductLine;
 import kr.hhplus.be.server.domain.product.application.repository.ProductLineRepository;
 import kr.hhplus.be.server.domain.product.application.service.ProductLineService;
-import kr.hhplus.be.server.domain.user.entity.Point;
-import kr.hhplus.be.server.domain.user.entity.Users;
-import kr.hhplus.be.server.domain.user.facade.UserPointFacade;
-import kr.hhplus.be.server.domain.user.repository.PointRepository;
-import kr.hhplus.be.server.domain.user.repository.UserRepository;
+import kr.hhplus.be.server.domain.user.application.Point;
+import kr.hhplus.be.server.domain.user.application.Users;
+import kr.hhplus.be.server.domain.user.application.facade.UserPointFacade;
+import kr.hhplus.be.server.domain.user.application.repository.PointRepository;
+import kr.hhplus.be.server.domain.user.application.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.List;
 
-import static kr.hhplus.be.server.TestData.TestInstance.PersistOrder.getPersistOrder;
-import static kr.hhplus.be.server.TestData.TestInstance.PersistProduct.getPersistProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 

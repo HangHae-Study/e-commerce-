@@ -20,14 +20,22 @@ public class OrderJpaEntity {
     @Id
     private String orderId;
 
+    @Column(nullable = false)
     private Long userId;
 
+    @Column(precision = 12, scale = 2)
     private BigDecimal totalPrice;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<OrderLineJpaEntity> orderLines = new ArrayList<>();
 
+    @Column(
+            nullable = false,
+            columnDefinition = "DEFAULT CURRENT_TIMESTAMP"
+    )
     private LocalDateTime orderDt;
+
+    @Column(nullable = false)
     private String status;
 
     @UpdateTimestamp

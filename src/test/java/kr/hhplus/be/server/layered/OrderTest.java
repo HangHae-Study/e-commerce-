@@ -1,9 +1,7 @@
 package kr.hhplus.be.server.layered;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.transaction.Transactional;
 import kr.hhplus.be.server.TestData.TestInstance;
-import kr.hhplus.be.server.domain.coupon.adapter.repository.CouponIssueJpaRepository;
 import kr.hhplus.be.server.domain.coupon.application.CouponIssue;
 import kr.hhplus.be.server.domain.coupon.application.repository.CouponIssueRepository;
 import kr.hhplus.be.server.domain.order.adapter.repository.OrderJpaRepository;
@@ -16,34 +14,25 @@ import kr.hhplus.be.server.domain.order.application.dto.OrderCreateRequest;
 import kr.hhplus.be.server.domain.order.application.repository.OrderLineRepository;
 import kr.hhplus.be.server.domain.order.application.repository.OrderRepository;
 import kr.hhplus.be.server.domain.order.application.service.OrderService;
-import kr.hhplus.be.server.domain.product.adapter.entity.ProductJpaEntity;
-import kr.hhplus.be.server.domain.product.adapter.entity.ProductLineJpaEntity;
 import kr.hhplus.be.server.domain.product.application.repository.ProductLineRepository;
 import kr.hhplus.be.server.domain.product.application.repository.ProductRepository;
-import kr.hhplus.be.server.domain.user.entity.Users;
-import kr.hhplus.be.server.domain.user.repository.UserRepository;
+import kr.hhplus.be.server.domain.user.application.Users;
+import kr.hhplus.be.server.domain.user.application.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static kr.hhplus.be.server.TestData.TestInstance.MockOrder.getMockOrder;
 import static kr.hhplus.be.server.TestData.TestInstance.PersistOrder.getPersistOrder;

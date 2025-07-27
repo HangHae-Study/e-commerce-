@@ -1,12 +1,9 @@
-package kr.hhplus.be.server.domain.user.service;
+package kr.hhplus.be.server.domain.user.application.service;
 
-import kr.hhplus.be.server.domain.user.entity.Point;
-import kr.hhplus.be.server.domain.user.repository.PointRepository;
+import kr.hhplus.be.server.domain.user.application.Point;
+import kr.hhplus.be.server.domain.user.application.repository.PointRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor

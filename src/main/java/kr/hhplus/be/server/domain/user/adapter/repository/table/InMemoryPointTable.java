@@ -1,7 +1,7 @@
-package kr.hhplus.be.server.domain.user.repository.table;
+package kr.hhplus.be.server.domain.user.adapter.repository.table;
 
 import kr.hhplus.be.server.common.inmemory.AbstractInMemoryTable;
-import kr.hhplus.be.server.domain.user.entity.Point;
+import kr.hhplus.be.server.domain.user.application.Point;
 import org.springframework.stereotype.Component;
 
 @Component

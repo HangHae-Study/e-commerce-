@@ -2,16 +2,14 @@ package kr.hhplus.be.server.domain.user.controller;
 
 import jakarta.validation.Valid;
 import kr.hhplus.be.server.common.api.ApiResponse;
-import kr.hhplus.be.server.domain.user.dto.BalanceChargeRequest;
-import kr.hhplus.be.server.domain.user.dto.BalanceChargeResponse;
-import kr.hhplus.be.server.domain.user.dto.BalanceInquiryResponse;
-import kr.hhplus.be.server.domain.user.entity.Point;
-import kr.hhplus.be.server.domain.user.facade.UserPointFacade;
+import kr.hhplus.be.server.domain.user.controller.dto.BalanceChargeRequest;
+import kr.hhplus.be.server.domain.user.controller.dto.BalanceChargeResponse;
+import kr.hhplus.be.server.domain.user.controller.dto.BalanceInquiryResponse;
+import kr.hhplus.be.server.domain.user.application.Point;
+import kr.hhplus.be.server.domain.user.application.facade.UserPointFacade;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/points")

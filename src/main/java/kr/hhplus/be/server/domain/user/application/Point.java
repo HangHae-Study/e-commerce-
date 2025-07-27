@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.domain.user.entity;
+package kr.hhplus.be.server.domain.user.application;
 
 import jakarta.persistence.Column;
 import lombok.Data;

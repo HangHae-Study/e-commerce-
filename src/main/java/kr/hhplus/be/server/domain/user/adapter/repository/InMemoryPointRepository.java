@@ -1,7 +1,8 @@
-package kr.hhplus.be.server.domain.user.repository;
+package kr.hhplus.be.server.domain.user.adapter.repository;
 
-import kr.hhplus.be.server.domain.user.entity.Point;
-import kr.hhplus.be.server.domain.user.repository.table.InMemoryPointTable;
+import kr.hhplus.be.server.domain.user.application.Point;
+import kr.hhplus.be.server.domain.user.application.repository.PointRepository;
+import kr.hhplus.be.server.domain.user.adapter.repository.table.InMemoryPointTable;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

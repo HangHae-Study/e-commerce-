@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.domain.user.entity;
+package kr.hhplus.be.server.domain.user.application;
 
 import lombok.Data;
 

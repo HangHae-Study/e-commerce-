@@ -21,18 +21,32 @@ public class OrderLineJpaEntity {
     @JoinColumn(name = "order_id")
     private OrderJpaEntity order;
 
+    @Column(nullable = false)
     private Long userId;
+
+    @Column(nullable = false)
     private Long productId;
+
+    @Column(nullable = false)
     private Long productLineId;
 
+    @Column(precision = 12, scale = 2)
     private BigDecimal orderLinePrice;
     private int quantity;
 
+    @Column(columnDefinition= "DEFAULT 'N'")
     private String couponYn;
     private String couponCode;
+    @Column(precision = 12, scale = 2)
     private BigDecimal disCountPrice;
 
+    @Column(nullable=false)
     private String status;
+
+    @Column(
+            nullable = false,
+            columnDefinition = "DEFAULT CURRENT_TIMESTAMP"
+    )
     private LocalDateTime orderDt;
 
     @UpdateTimestamp

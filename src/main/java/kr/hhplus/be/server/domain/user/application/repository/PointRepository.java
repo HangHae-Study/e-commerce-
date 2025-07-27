@@ -1,7 +1,7 @@
-package kr.hhplus.be.server.domain.user.repository;
+package kr.hhplus.be.server.domain.user.application.repository;
 
 import kr.hhplus.be.server.common.RepositoryPort;
-import kr.hhplus.be.server.domain.user.entity.Point;
+import kr.hhplus.be.server.domain.user.application.Point;
 
 import java.util.Optional;
 

@@ -3,17 +3,15 @@ package kr.hhplus.be.server.domain.order.application.facade;
 import kr.hhplus.be.server.domain.coupon.application.CouponIssue;
 import kr.hhplus.be.server.domain.coupon.application.service.CouponService;
 import kr.hhplus.be.server.domain.order.application.Order;
-import kr.hhplus.be.server.domain.order.application.cached.LockPort;
 import kr.hhplus.be.server.domain.order.application.dto.OrderCreateRequest;
 import kr.hhplus.be.server.domain.order.application.dto.OrderCreateResponse;
 import kr.hhplus.be.server.domain.order.application.service.OrderService;
-import kr.hhplus.be.server.domain.user.entity.Users;
-import kr.hhplus.be.server.domain.user.service.UserService;
+import kr.hhplus.be.server.domain.user.application.Users;
+import kr.hhplus.be.server.domain.user.application.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor

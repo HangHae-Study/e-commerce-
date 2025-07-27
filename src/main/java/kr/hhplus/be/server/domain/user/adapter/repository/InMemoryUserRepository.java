@@ -1,7 +1,8 @@
-package kr.hhplus.be.server.domain.user.repository;
+package kr.hhplus.be.server.domain.user.adapter.repository;
 
-import kr.hhplus.be.server.domain.user.entity.Users;
-import kr.hhplus.be.server.domain.user.repository.table.InMemoryUserTable;
+import kr.hhplus.be.server.domain.user.application.Users;
+import kr.hhplus.be.server.domain.user.application.repository.UserRepository;
+import kr.hhplus.be.server.domain.user.adapter.repository.table.InMemoryUserTable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -10,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class InMemoryUserRepository implements UserRepository{
+public class InMemoryUserRepository implements UserRepository {
     private final InMemoryUserTable userTable = new InMemoryUserTable();
 
     @Override
