@@ -6,8 +6,6 @@ import kr.hhplus.be.server.domain.user.controller.dto.BalanceChargeRequest;
 import kr.hhplus.be.server.domain.user.application.Point;
 import kr.hhplus.be.server.domain.user.application.Users;
 import kr.hhplus.be.server.domain.user.application.facade.UserPointFacade;
-import kr.hhplus.be.server.domain.user.adapter.repository.InMemoryPointRepository;
-import kr.hhplus.be.server.domain.user.adapter.repository.InMemoryUserRepository;
 import kr.hhplus.be.server.domain.user.application.repository.PointRepository;
 import kr.hhplus.be.server.domain.user.application.repository.UserRepository;
 import kr.hhplus.be.server.domain.user.application.service.PointService;

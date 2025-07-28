@@ -3,6 +3,7 @@ package kr.hhplus.be.server.domain.order.application.service;
 import kr.hhplus.be.server.domain.coupon.application.CouponIssue;
 import kr.hhplus.be.server.domain.order.application.Order;
 import kr.hhplus.be.server.domain.order.application.OrderLine;
+import kr.hhplus.be.server.domain.order.application.dto.OrderCreateRequest;
 import kr.hhplus.be.server.domain.order.application.repository.OrderLineRepository;
 import kr.hhplus.be.server.domain.order.application.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -63,5 +64,15 @@ public class OrderService {
         // O_MAKE -> O_CMPL;
         order.complete();
         order.getOrderLines().forEach(OrderLine::complete);
+    }
+
+    public Order orderRequested(OrderCreateRequest req, CouponIssue couponIssue) {
+        Order newOrder = Order.create(req);
+
+        if(couponIssue != null){
+            return createOrder(newOrder, couponIssue);
+        }else{
+            return createOrder(newOrder);
+        }
     }
 }

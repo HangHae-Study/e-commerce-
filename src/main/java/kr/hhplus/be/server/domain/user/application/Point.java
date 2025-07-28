@@ -11,7 +11,6 @@ public class Point {
     private Long pointId;
     private Long userId;
 
-    @Column(precision = 12, scale = 2, nullable = false)
     private BigDecimal balance;
 
     private LocalDateTime updateDt;
@@ -45,7 +44,6 @@ public class Point {
         this.userId = uId;
         this.balance = BigDecimal.ZERO;
         updateDt = LocalDateTime.now();
-
     }
 
     public Point(Long uId, Object balance){

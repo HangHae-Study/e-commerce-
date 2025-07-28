@@ -23,17 +23,8 @@ public class OrderFacade {
 
     public OrderCreateResponse createOrder(OrderCreateRequest req) {
         Users user = userService.getUser(req.userId());
-        CouponIssue couponIssue = couponService.getCouponIssue(user.getUserId(), req.couponCode());
-
-        Order newOrder = Order.create(req);
-
-        Order createdOrder;
-        if(couponIssue != null){
-            couponService.couponAppliedByOrder(couponIssue);
-            createdOrder = orderService.createOrder(newOrder, couponIssue);
-        }else{
-            createdOrder = orderService.createOrder(newOrder);
-        }
+        CouponIssue couponIssue = couponService.couponAppliedByOrder(user.getUserId(), req.couponCode());
+        Order createdOrder = orderService.orderRequested(req, couponIssue);
 
         List<OrderCreateResponse.OrderResItem> items = createdOrder.getOrderLines().stream()
                 .map(
