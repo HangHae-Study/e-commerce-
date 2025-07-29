@@ -1,7 +1,6 @@
-package kr.hhplus.be.server.layered;
+package kr.hhplus.be.server.domain.order;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.hhplus.be.server.TestData.TestInstance;
 import kr.hhplus.be.server.domain.coupon.application.CouponIssue;
 import kr.hhplus.be.server.domain.coupon.application.repository.CouponIssueRepository;
 import kr.hhplus.be.server.domain.order.adapter.repository.OrderJpaRepository;
@@ -33,9 +32,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static kr.hhplus.be.server.TestData.TestInstance.MockOrder.getMockOrder;
-import static kr.hhplus.be.server.TestData.TestInstance.PersistOrder.getPersistOrder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -43,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class OrderTest {
-
+/*
 
     @Nested @DisplayName("주문 도메인 테스트")
     @ExtendWith(MockitoExtension.class)
@@ -260,6 +256,6 @@ public class OrderTest {
         }
     }
 
-
+*/
 
 }

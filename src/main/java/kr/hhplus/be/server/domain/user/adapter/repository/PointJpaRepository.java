@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
+//@Repository
 public interface PointJpaRepository extends JpaRepository<PointJpaEntity, Long> {
     public Optional<PointJpaEntity> findPointJpaRepositoryByUserId(Long userId);
 }

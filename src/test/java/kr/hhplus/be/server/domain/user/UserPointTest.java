@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.layered;
+package kr.hhplus.be.server.domain.user;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -101,21 +101,18 @@ public class UserPointTest
     @Nested @DisplayName("유저 잔액 Repository 단위 테스트")
     class UserRepositoryTest{
         @Autowired
-        UsersJpaRepository jpaRepository;
+        UserRepository userRepository;
 
         @Test
         void 유저_저장_및_조회() {
-            UsersJpaEntity saved = jpaRepository.save(
-                    UsersJpaEntity.fromDomain(Users.builder()
-                                    .userId(null)
-                                    .username("testUser")
-                                    .balance(BigDecimal.ZERO)
-                                    .createDt(now())
-                                    .updateDt(now())
-                                    .build())
+            Users saved = userRepository.save(
+                    Users.builder()
+                            .username("testUser")
+                            .balance(BigDecimal.valueOf(40))
+                            .build()
             );
 
-            Optional<UsersJpaEntity> result = jpaRepository.findById(saved.getUserId());
+            Optional<Users> result = userRepository.findById(saved.getUserId());
 
             assertThat(result).isPresent();
             assertThat(result.get().getUserId()).isNotEqualTo(null);

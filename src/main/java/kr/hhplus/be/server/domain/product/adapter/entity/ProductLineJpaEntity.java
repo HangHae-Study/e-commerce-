@@ -25,7 +25,7 @@ public class ProductLineJpaEntity {
     private Long productId;
 
     @Column(length = 100, nullable = false)
-    private String productName;
+    private String productLineName;
 
     @Column(precision = 12, scale = 2)
     private BigDecimal productLinePrice;
@@ -47,7 +47,7 @@ public class ProductLineJpaEntity {
         return ProductLine.builder()
                 .productLineId(productLineId)
                 .productId(productId)
-                .productName(productName)
+                .productLineName(productLineName)
                 .productLinePrice(productLinePrice)
                 .productLineType(productLineType)
                 .remaining(remaining)
@@ -58,7 +58,7 @@ public class ProductLineJpaEntity {
     public static ProductLineJpaEntity fromDomain(ProductLine line) {
         ProductLineJpaEntity entity = new ProductLineJpaEntity();
         entity.productId = line.getProductId();
-        entity.productName = line.getProductName();
+        entity.productLineName = line.getProductLineName();
         entity.productLinePrice = line.getProductLinePrice();
         entity.productLineType = line.getProductLineType();
         entity.remaining = line.getRemaining();

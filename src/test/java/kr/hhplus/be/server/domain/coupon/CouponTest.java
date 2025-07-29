@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.layered;
+package kr.hhplus.be.server.domain.coupon;
 
 import kr.hhplus.be.server.domain.coupon.adapter.entity.CouponIssueJpaEntity;
 import kr.hhplus.be.server.domain.coupon.adapter.entity.CouponJpaEntity;

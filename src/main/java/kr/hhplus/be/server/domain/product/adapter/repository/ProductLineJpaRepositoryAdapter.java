@@ -25,9 +25,10 @@ public class ProductLineJpaRepositoryAdapter implements ProductLineRepository {
     }
 
     @Override
-    public ProductLine save(ProductLine productLine) {
-        productLineJpaRepository.save(ProductLineJpaEntity.fromDomain(productLine));
-        return productLine;
+    public ProductLine save(ProductLine domain) {
+        ProductLineJpaEntity e = ProductLineJpaEntity.fromDomain(domain);
+        ProductLineJpaEntity saved = productLineJpaRepository.save(e);
+        return saved.toDomain();
     }
 
     @Override
