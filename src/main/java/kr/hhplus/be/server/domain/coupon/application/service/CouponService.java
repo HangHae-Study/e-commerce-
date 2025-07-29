@@ -81,8 +81,8 @@ public class CouponService {
         return ci;
     }
 
-    public void couponAppliedByOrder(CouponIssue couponIssue){
-
+    public CouponIssue couponAppliedByOrder(String couponIssue){
+        return null;
     }
 
 }

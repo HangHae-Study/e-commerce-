@@ -187,7 +187,7 @@ public class OrderTest {
         @BeforeEach
         void setUp() {
             // 1) 유저 저장 (id = 1L)
-            userRepo.save(new Users(1L));
+            //userRepo.save(new Users(1L));
 
             // 2) 상품 및 상품 라인 저장
             var pp = TestInstance.PersistProduct.getPersistProduct();

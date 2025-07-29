@@ -2,30 +2,43 @@ package kr.hhplus.be.server.layered;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.hhplus.be.server.domain.user.adapter.entity.UsersJpaEntity;
+import kr.hhplus.be.server.domain.user.adapter.repository.UsersJpaRepository;
+import kr.hhplus.be.server.domain.user.application.dto.PointDao;
 import kr.hhplus.be.server.domain.user.controller.dto.BalanceChargeRequest;
-import kr.hhplus.be.server.domain.user.application.Point;
 import kr.hhplus.be.server.domain.user.application.Users;
-import kr.hhplus.be.server.domain.user.application.facade.UserPointFacade;
 import kr.hhplus.be.server.domain.user.application.repository.PointRepository;
 import kr.hhplus.be.server.domain.user.application.repository.UserRepository;
-import kr.hhplus.be.server.domain.user.application.service.PointService;
 import kr.hhplus.be.server.domain.user.application.service.UserService;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.TestcontainersConfiguration;
 
 import java.math.BigDecimal;
 import java.util.NoSuchElementException;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.Optional;
 
+import static java.time.LocalDateTime.now;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -34,121 +47,172 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 public class UserPointTest
 {
-    private UserService userService;
-    private UserRepository userRepository;
-    @BeforeEach
-    void setup(){
-        userRepository = new InMemoryUserRepository();
-        userService = new UserService(userRepository);
-    }
 
-    @Nested @DisplayName("유저 Valid 테스트")
-    class UserValidTest{
-        @Test
-        void 존재하지_않는_유저_조회(){
-            Long userId = 10L;
-            assertThrows(NoSuchElementException.class, () -> userService.getUser(userId));
-        }
-    }
-
-    Point getUserPoint() {
-        long pointId = ThreadLocalRandom.current().nextLong(1, 10_000);
-        long userId = ThreadLocalRandom.current().nextLong(1, 10_000);
-        int balance = ThreadLocalRandom.current().nextInt(0, 1_000_001); // 0 ~ 1,000,000
-
-        return new Point(userId, balance);
-    }
 
     @Nested @DisplayName("유저 잔액 도메인 단위 테스트")
     class PointDomainUnitTest{
         @Test
         void 유저_정상_충전(){
-            Point point = getUserPoint();
-            BigDecimal initBalance = point.getBalance();
-            point.charge(200);
+            Users user = Users.builder()
+                    .balance(BigDecimal.ZERO)
+                    .build();
 
-            Assertions.assertEquals(initBalance.add(BigDecimal.valueOf(200)), point.getBalance());
+            BigDecimal initBalance = user.getBalance();
+            user.pointCharge(200);
+
+            Assertions.assertEquals(initBalance.add(BigDecimal.valueOf(200)), user.getBalance());
         }
 
 
         @ParameterizedTest
         @ValueSource(ints = {0, -1, -500})
         void 충전_금액이_0_이하일_경우_예외(int invalidAmount) {
-            Point point = getUserPoint();
+            Users user = Users.builder()
+                    .balance(BigDecimal.ZERO)
+                    .build();
 
-            assertThrows(IllegalArgumentException.class, () -> point.charge(invalidAmount));
+            assertThrows(IllegalArgumentException.class, () -> user.pointCharge(invalidAmount));
         }
 
+        @Test
+        void 유저_포인트_사용_성공(){
+            Users user = Users.builder()
+                    .balance(BigDecimal.valueOf(100L))
+                    .build();
+            BigDecimal initBalance = user.getBalance();
+
+            user.pointUse(50L);
+
+            Assertions.assertEquals(initBalance.subtract(BigDecimal.valueOf(50)), user.getBalance());
+        }
+
+        @Test
+        void 유저_포인트_사용_금액_초과(){
+            Users user = Users.builder()
+                    .balance(BigDecimal.valueOf(40))
+                    .build();
+            BigDecimal initBalance = user.getBalance();
+
+            assertThrows(IllegalArgumentException.class, () -> user.pointUse(50L));
+        }
     }
 
+    @DataJpaTest
+    @Nested @DisplayName("유저 잔액 Repository 단위 테스트")
+    class UserRepositoryTest{
+        @Autowired
+        UsersJpaRepository jpaRepository;
 
-    @Nested
-    @DisplayName("잔액 충전 유즈 케이스")
-    class UserPointFacadeTest {
+        @Test
+        void 유저_저장_및_조회() {
+            UsersJpaEntity saved = jpaRepository.save(
+                    UsersJpaEntity.fromDomain(Users.builder()
+                                    .userId(null)
+                                    .username("testUser")
+                                    .balance(BigDecimal.ZERO)
+                                    .createDt(now())
+                                    .updateDt(now())
+                                    .build())
+            );
 
-        private UserPointFacade userPointFacade;
+            Optional<UsersJpaEntity> result = jpaRepository.findById(saved.getUserId());
 
+            assertThat(result).isPresent();
+            assertThat(result.get().getUserId()).isNotEqualTo(null);
+            assertThat(result.get().getUsername()).isEqualTo("testUser");
+        }
+    }
+
+    @ExtendWith(MockitoExtension.class)
+    @Nested @DisplayName("유저 잔액 Service 단위 테스트")
+    @ContextConfiguration(classes = TestcontainersConfiguration.class)
+    class UserServiceTest{
+        @InjectMocks
+        private UserService userService;
+
+        @Mock
         private UserRepository userRepository;
+        @Mock
         private PointRepository pointRepository;
 
-        @BeforeEach
-        void setup() {
-            userRepository = new InMemoryUserRepository();
-            pointRepository = new InMemoryPointRepository();
-
-            UserService userService = new UserService(userRepository);
-            PointService pointService = new PointService(pointRepository);
-
-            userPointFacade = new UserPointFacade(userService, pointService);
-
-            // 초기 유저 등록 (ID = 1)
-            Users user = new Users(1L);
-            ((InMemoryUserRepository) userRepository).save(user);
-
-            // 초기 포인트 등록 (userId = 1, balance = 0)
-            Point point = new Point(1L, 0);
-            ((InMemoryPointRepository) pointRepository).save(point);
-        }
-
         @Test
-        @DisplayName("유저가 정상적으로 포인트를 충전할 수 있다")
-        void 유저_잔액_충전_성공() {
+        void 포인트_충전_성공() {
+            // given
+            Long userId = 1L;
+            BigDecimal 기존잔액 = new BigDecimal("1000");
+
+            Users user = Users.builder()
+                    .userId(userId)
+                    .username("테스트")
+                    .balance(기존잔액)
+                    .createDt(now())
+                    .updateDt(now())
+                    .build();
+
+            PointDao pointDao = PointDao.builder()
+                    .userId(userId)
+                    .balance(기존잔액)
+                    .build();
+
+            when(pointRepository.findByUserId(userId)).thenReturn(Optional.of(pointDao));
+            when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+            when(userRepository.save(any())).thenReturn(user);
+
             // when
-            Point charged = userPointFacade.chargeUserPoint(1L, 500);
+            Users result = userService.chargePoint(userId, 500);
 
             // then
-            assertEquals(new BigDecimal("500"), charged.getBalance());
+            assertThat(result.getBalance()).isEqualByComparingTo("1500");
+
+            verify(userRepository).save(user);
         }
 
         @Test
-        @DisplayName("존재하지 않는 유저일 경우 예외가 발생한다")
-        void 유저가_없을때_예외_발생() {
-            assertThrows(NoSuchElementException.class, () -> {
-                userPointFacade.chargeUserPoint(999L, 100);
-            });
+        void 유저가_없으면_예외_발생() {
+            Long userId = 999L;
+            when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> userService.chargePoint(userId, 500))
+                    .isInstanceOf(NoSuchElementException.class)
+                    .hasMessageContaining("존재하지 않는 유저");
         }
 
         @Test
-        @DisplayName("충전 금액이 0 또는 음수일 경우 예외 발생")
-        void 음수_또는_0_금액_충전_예외() {
-            assertAll(
-                    () -> assertThrows(IllegalArgumentException.class, () -> userPointFacade.chargeUserPoint(1L, 0)),
-                    () -> assertThrows(IllegalArgumentException.class, () -> userPointFacade.chargeUserPoint(1L, -100))
-            );
+        void 충전_도중_예외_발생시_DB저장은_되지_않는다() {
+            Users user = Users.builder()
+                    .userId(1L)
+                    .username("테스트")
+                    .balance(BigDecimal.ZERO)
+                    .createDt(now())
+                    .updateDt(now())
+                    .build();
+
+            PointDao pointDao = PointDao.builder()
+                    .userId(1L)
+                    .balance(BigDecimal.ZERO)
+                    .build();
+
+            when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+            when(pointRepository.findByUserId(1L)).thenReturn(Optional.of(pointDao));
+
+            assertThatThrownBy(() -> userService.chargePoint(1L, -999))
+                    .isInstanceOf(IllegalArgumentException.class);
+
+            verify(userRepository, never()).save(any());
         }
     }
 
     @Nested
     @SpringBootTest
     @AutoConfigureMockMvc
+    @Testcontainers
+    @ContextConfiguration(classes = TestcontainersConfiguration.class)
     class ControllerTest{
         @Autowired
         private MockMvc mockMvc;
 
-        @Autowired
         private ObjectMapper objectMapper;
 
-        // 필요하다면 테스트용 인메모리 저장소 주입
         @Autowired
         private UserRepository userRepository;
 
@@ -157,8 +221,15 @@ public class UserPointTest
 
         @BeforeEach
         void setup() {
-            userRepository.save(new Users(1L));
-            pointRepository.save(new Point(1L, 1L, 1000));
+
+           objectMapper = new ObjectMapper();
+            userRepository.save(
+                    Users.builder()
+                        .username("테스트")
+                        .balance(BigDecimal.ZERO)
+                        .createDt(now())
+                        .updateDt(now())
+                        .build());
         }
 
         @Test

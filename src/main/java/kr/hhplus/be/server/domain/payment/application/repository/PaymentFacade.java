@@ -9,8 +9,6 @@ import kr.hhplus.be.server.domain.payment.application.dto.PaymentResponse;
 import kr.hhplus.be.server.domain.payment.application.service.PaymentService;
 import kr.hhplus.be.server.domain.product.application.ProductLine;
 import kr.hhplus.be.server.domain.product.application.service.ProductLineService;
-import kr.hhplus.be.server.domain.user.application.Point;
-import kr.hhplus.be.server.domain.user.application.facade.UserPointFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +19,6 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class PaymentFacade {
-    private final UserPointFacade pointFacade;
     private final OrderService orderService;
     private final ProductLineService productLineService;
     private final PaymentService paymentService;
@@ -50,10 +47,10 @@ public class PaymentFacade {
         }
 
         // 잔고 확인
-        Point point = pointFacade.getPoint(order.getUserId());
-        if(point.getBalance().compareTo(order.getTotalPrice()) < 0){
-            throw new IllegalStateException("잔고 부족");
-        }
+        //Point point = pointFacade.getPoint(order.getUserId());
+        //if(point.getBalance().compareTo(order.getTotalPrice()) < 0){
+        //    throw new IllegalStateException("잔고 부족");
+        //}
 
         try{
             // 재고 감소
@@ -63,8 +60,8 @@ public class PaymentFacade {
                 productLineService.decrease(stock);
             }
 
-            point.use(order.getTotalPrice());
-            pointFacade.updateUserPoint(order.getUserId(), order.getTotalPrice());
+            //point.use(order.getTotalPrice());
+            //pointFacade.updateUserPoint(order.getUserId(), order.getTotalPrice());
             orderService.orderComplete(order);
 
             // 결제 시도

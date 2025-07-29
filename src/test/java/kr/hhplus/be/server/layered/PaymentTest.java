@@ -10,9 +10,7 @@ import kr.hhplus.be.server.domain.payment.application.repository.PaymentFacade;
 import kr.hhplus.be.server.domain.payment.application.repository.PaymentRepository;
 import kr.hhplus.be.server.domain.product.application.repository.ProductLineRepository;
 import kr.hhplus.be.server.domain.product.application.service.ProductLineService;
-import kr.hhplus.be.server.domain.user.application.Point;
 import kr.hhplus.be.server.domain.user.application.Users;
-import kr.hhplus.be.server.domain.user.application.facade.UserPointFacade;
 import kr.hhplus.be.server.domain.user.application.repository.PointRepository;
 import kr.hhplus.be.server.domain.user.application.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,8 +44,8 @@ class PaymentFacadeIntegrationTest {
     @Autowired
     UserRepository userRepository;
 
-    @Autowired
-    UserPointFacade pointFacade;
+    //@Autowired
+    //UserPointFacade pointFacade;
     @Autowired
     PointRepository pointRepository;
 
@@ -84,8 +82,8 @@ class PaymentFacadeIntegrationTest {
         orderRepository.save(order);
 
         // 포인트 충전
-        userRepository.save(new Users(1L));
-        pointRepository.save(new Point(userId, BigDecimal.valueOf(70000.0)));
+        //userRepository.save(new Users(1L));
+       // pointRepository.save(new Point(userId, BigDecimal.valueOf(70000.0)));
 
         // 재고 등록
         productLineRepository.save(line1);

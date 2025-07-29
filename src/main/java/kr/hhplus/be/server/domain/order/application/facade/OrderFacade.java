@@ -23,7 +23,7 @@ public class OrderFacade {
 
     public OrderCreateResponse createOrder(OrderCreateRequest req) {
         Users user = userService.getUser(req.userId());
-        CouponIssue couponIssue = couponService.couponAppliedByOrder(user.getUserId(), req.couponCode());
+        CouponIssue couponIssue = couponService.couponAppliedByOrder(req.couponCode());
         Order createdOrder = orderService.orderRequested(req, couponIssue);
 
         List<OrderCreateResponse.OrderResItem> items = createdOrder.getOrderLines().stream()

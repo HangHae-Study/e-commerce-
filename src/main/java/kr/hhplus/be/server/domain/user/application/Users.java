@@ -33,9 +33,19 @@ public class Users {
         return this;
     }
 
-    public void pointUse(Object amount){
+    public Users pointUse(Object amount){
+        if(!(amount instanceof Number)){
+            throw new NumberFormatException("포인트 사용량은 숫자로 표기하여야합니다.");
+        }
         BigDecimal amt = new BigDecimal(amount.toString());
+
+        if(amt.compareTo(balance) > 0){
+            throw new IllegalArgumentException("현재 잔액이 부족합니다");
+        }
+
         this.balance = this.balance.subtract(amt);
+
+        return this;
     }
 
 }
