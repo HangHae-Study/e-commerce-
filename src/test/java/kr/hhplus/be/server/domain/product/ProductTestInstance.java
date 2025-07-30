@@ -62,4 +62,17 @@ public class ProductTestInstance {
                 .updateDt(LocalDateTime.now())
                 .build();
     }
+
+    public static List<Product> productList() {
+        return List.of(
+                simpleProduct(),
+                productWithOneLine()
+        );
+    }
+
+    public static List<ProductLine> productLineList() {
+        return List.of(
+                simpleLine()
+        );
+    }
 }

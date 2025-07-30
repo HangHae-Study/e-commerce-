@@ -43,9 +43,8 @@ public class CouponIssueJpaRepositoryAdapter implements CouponIssueRepository {
     }
 
     @Override
-    public CouponIssue findByCouponCode(String code) {
-        CouponIssueJpaEntity entity = couponIssueJpaRepository.findCouponIssueJpaEntitiesByCouponCode(code)
-                .orElseThrow(() -> new NoSuchElementException("발급(유효)되지 않은 쿠폰입니다."));
-        return entity.toDomain();
+    public Optional<CouponIssue> findByCouponCode(String code) {
+        return couponIssueJpaRepository.findCouponIssueJpaEntitiesByCouponCode(code).map(CouponIssueJpaEntity::toDomain);
+
     }
 }

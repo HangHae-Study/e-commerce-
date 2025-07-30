@@ -9,4 +9,7 @@ public record ProductDetailResponse(
         String description,
         BigDecimal price,
         List<ProductLineItem> lines
-) {}
+) {
+    public record ProductLineItem(Long productLineId, String lineType, BigDecimal linePrice, Long remaining) {}
+
+}

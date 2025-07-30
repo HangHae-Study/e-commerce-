@@ -23,10 +23,8 @@ public class ProductLineService {
                 .orElseThrow(() -> new NoSuchElementException("올바르지 않은 상품입니다"));
     }
 
-    public void decrease(ProductLine product){
+    public void updateProductLine(ProductLine product){
         productLineRepository.save(product);
     }
-
-
 
 }

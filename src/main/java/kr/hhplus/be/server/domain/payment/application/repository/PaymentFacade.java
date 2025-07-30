@@ -57,7 +57,7 @@ public class PaymentFacade {
             for(OrderLine line : lines){
                 ProductLine stock = stockCountMap.get(line.getProductLineId());
                 stock.decreaseStock((long) line.getQuantity());
-                productLineService.decrease(stock);
+                productLineService.updateProductLine(stock);
             }
 
             //point.use(order.getTotalPrice());
