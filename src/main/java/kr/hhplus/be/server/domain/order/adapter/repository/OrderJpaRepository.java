@@ -11,7 +11,6 @@ import java.util.Optional;
 @Repository
 public interface OrderJpaRepository extends JpaRepository<OrderJpaEntity, Long> {
 
-    //@EntityGraph(attributePaths = "orderLines")
-    Optional<OrderJpaEntity> findById(Long id);
+    Optional<OrderJpaEntity> findByOrderCode(String code);
 
 }

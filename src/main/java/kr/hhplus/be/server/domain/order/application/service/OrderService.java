@@ -33,4 +33,20 @@ public class OrderService {
                 .orElseThrow(() -> new NoSuchElementException("올바르지 않은 주문 입니다"));
         return order;
     }
+
+    public Order getOrderByCode(String orderCode){
+        Order order = orderRepository.findByOrderCode(orderCode)
+                .orElseThrow(() -> new NoSuchElementException("올바르지 않은 주문 입니다"));
+        return order;
+    }
+
+
+    public void orderComplete(Order order) {
+        order.complete();
+        for (OrderLine orderLine : order.getOrderLines()) {
+            orderLine.complete();
+        }
+
+        orderRepository.save(order);
+    }
 }

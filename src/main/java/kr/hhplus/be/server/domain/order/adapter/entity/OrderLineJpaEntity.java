@@ -24,8 +24,8 @@ public class OrderLineJpaEntity {
     @Column(nullable = false)
     private Long userId;
 
-    @Column(nullable = false)
-    private Long productId;
+    //@Column(nullable = false)
+    //private Long productId;
 
     @Column(nullable = false)
     private Long productLineId;
@@ -34,8 +34,8 @@ public class OrderLineJpaEntity {
     private BigDecimal orderLinePrice;
     private int quantity;
 
-    @Column(columnDefinition= "DEFAULT 'N'")
-    private String couponYn;
+    @Column(length = 1,nullable = false , columnDefinition = "VARCHAR(1) DEFAULT 'N'")
+    private String couponYn = "N";
     private String couponCode;
     @Column(precision = 12, scale = 2)
     private BigDecimal disCountPrice;
@@ -45,7 +45,7 @@ public class OrderLineJpaEntity {
 
     @Column(
             nullable = false,
-            columnDefinition = "DEFAULT CURRENT_TIMESTAMP"
+            columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP"
     )
     private LocalDateTime orderDt;
 
@@ -57,12 +57,20 @@ public class OrderLineJpaEntity {
     )
     private LocalDateTime updateDt;
 
+
+    @PrePersist
+    public void prePersist(){
+        if(couponYn == null){
+            couponYn = "N";
+        }
+    }
+
     public OrderLine toDomain() {
         return OrderLine.builder()
                 .orderLineId(orderLineId)
                 .orderId(order.getOrderId())
                 .userId(userId)
-                .productId(productId)
+                .productId(null)
                 .productLineId(productLineId)
                 .quantity(quantity)
                 .orderLinePrice(orderLinePrice)
@@ -83,7 +91,7 @@ public class OrderLineJpaEntity {
         }
 
         entity.userId         = line.getUserId();
-        entity.productId      = line.getProductId();
+        //entity.productId      = line.getProductId();
         entity.productLineId  = line.getProductLineId();
         entity.orderLinePrice = line.getOrderLinePrice();
         entity.quantity       = line.getQuantity();

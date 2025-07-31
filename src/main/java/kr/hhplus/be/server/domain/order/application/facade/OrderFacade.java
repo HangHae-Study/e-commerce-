@@ -25,7 +25,7 @@ public class OrderFacade {
 
     public OrderCreateResponse createOrder(OrderCreateRequest req) {
         Users user = userService.getUser(req.userId());
-        CouponIssue couponIssue = couponService.couponAppliedByOrder(req.couponCode());
+        CouponIssue couponIssue = couponService.couponAppliedByOrder(user.getUserId(), req.couponCode());
 
         Order order = orderMapper.toDomain(req);
         if (couponIssue != null) {

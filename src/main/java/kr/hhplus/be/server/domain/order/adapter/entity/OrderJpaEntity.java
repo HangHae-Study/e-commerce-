@@ -34,7 +34,7 @@ public class OrderJpaEntity {
 
     @Column(
             nullable = false,
-            columnDefinition = "DEFAULT CURRENT_TIMESTAMP"
+            columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP"
     )
     private LocalDateTime orderDt;
 
@@ -51,13 +51,13 @@ public class OrderJpaEntity {
 
 
     public Order toDomain() {
-        //List<OrderLine> lines = orderLines.stream().map(OrderLineJpaEntity::toDomain).toList();
+        List<OrderLine> lines = orderLines.stream().map(OrderLineJpaEntity::toDomain).toList();
         return Order.builder()
                 .orderId(orderId)
                 .orderCode(orderCode)
                 .userId(userId)
                 .totalPrice(totalPrice)
-                //.orderLines(lines)
+                .orderLines(lines)
                 .orderDt(orderDt)
                 .status(status)
                 .updateDt(updateDt)
@@ -67,6 +67,7 @@ public class OrderJpaEntity {
     public static OrderJpaEntity fromDomain(Order order) {
         OrderJpaEntity entity = new OrderJpaEntity();
         entity.orderId = order.getOrderId();
+        entity.orderCode = order.getOrderCode();
         entity.totalPrice = order.getTotalPrice();
         entity.userId = order.getUserId();
         entity.orderLines = order.getOrderLines().stream()

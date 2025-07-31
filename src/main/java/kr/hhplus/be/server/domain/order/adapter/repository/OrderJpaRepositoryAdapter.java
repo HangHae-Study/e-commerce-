@@ -40,4 +40,9 @@ public class OrderJpaRepositoryAdapter implements OrderRepository {
     public void deleteById(Long orderId) {
         jpaRepository.deleteById(orderId);
     }
+
+    @Override
+    public Optional<Order> findByOrderCode(String code) {
+        return jpaRepository.findByOrderCode(code).map(OrderJpaEntity::toDomain);
+    }
 }

@@ -19,8 +19,8 @@ public class OrderController {
 
     @GetMapping("/key")
     public ResponseEntity<ApiResponse<OrderKeyResponse>> issueOrderKey() {
-        String orderId = UUID.randomUUID().toString();
-        return ResponseEntity.ok(ApiResponse.success(new OrderKeyResponse(orderId)));
+        String orderCode = UUID.randomUUID().toString();
+        return ResponseEntity.ok(ApiResponse.success(new OrderKeyResponse(orderCode)));
     }
 
     @PostMapping
