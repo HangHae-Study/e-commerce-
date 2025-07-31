@@ -59,9 +59,17 @@ public class CouponService {
         return ci;
     }
 
-    public CouponIssue couponAppliedByOrder(String couponIssue){
+    public CouponIssue couponAppliedByOrder(Long userId, String cCode){
+        if(cCode.isEmpty() || cCode.isBlank()){
+            return null;
+        }
 
-        return null;
+        CouponIssue ci = getCouponIssue(userId, cCode);
+        ci.setCouponValid("N");
+
+        couponIssueRepository.save(ci);
+
+        return ci;
     }
 
 }

@@ -97,7 +97,7 @@ public class UserPointTest
         }
     }
 
-    @DataJpaTest
+    @SpringBootTest
     @Nested @DisplayName("유저 잔액 Repository 단위 테스트")
     class UserRepositoryTest{
         @Autowired
@@ -220,7 +220,7 @@ public class UserPointTest
         void setup() {
 
            objectMapper = new ObjectMapper();
-            userRepository.save(
+           userRepository.save(
                     Users.builder()
                         .username("테스트")
                         .balance(BigDecimal.ZERO)

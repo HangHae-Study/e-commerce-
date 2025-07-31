@@ -1,11 +1,18 @@
 package kr.hhplus.be.server.domain.coupon.usecase;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.hhplus.be.server.domain.coupon.adapter.entity.CouponJpaEntity;
 import kr.hhplus.be.server.domain.coupon.application.Coupon;
 import kr.hhplus.be.server.domain.coupon.application.CouponIssue;
 import kr.hhplus.be.server.domain.coupon.application.generator.CouponCodeGenerator;
 import kr.hhplus.be.server.domain.coupon.application.repository.CouponIssueRepository;
 import kr.hhplus.be.server.domain.coupon.application.repository.CouponRepository;
 import kr.hhplus.be.server.domain.coupon.application.service.CouponService;
+import kr.hhplus.be.server.domain.coupon.controller.CouponController;
+import kr.hhplus.be.server.domain.coupon.controller.dto.CouponIssueRequest;
+import kr.hhplus.be.server.domain.coupon.controller.dto.CouponIssueResponse;
+import kr.hhplus.be.server.domain.coupon.controller.mapper.CouponIssueMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -13,6 +20,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -25,6 +39,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class CouponIssueUseCaseTest {
     @Nested
@@ -35,8 +52,7 @@ public class CouponIssueUseCaseTest {
         CouponCodeGenerator codeGenerator;  // 쿠폰 코드 생성기
 
         @Test
-        @DisplayName("남은 수량이 있으면 issueTo 시 remaining 이 감소하고 CouponIssue 생성")
-        void issueTo_success() {
+        void 쿠폰_도메인_발급() {
             // given
             Coupon coupon = Coupon.builder()
                     .couponId(1L)
@@ -59,8 +75,7 @@ public class CouponIssueUseCaseTest {
         }
 
         @Test
-        @DisplayName("남은 수량이 0 이면 issueTo 시 예외 발생")
-        void issueTo_noRemaining_throws() {
+        void 쿠폰_도메인_발급_실패() {
             Coupon coupon = Coupon.builder()
                     .couponId(1L)
                     .remaining(0L)
@@ -88,8 +103,7 @@ public class CouponIssueUseCaseTest {
         CouponService couponService;  // @Service 클래스
 
         @Test
-        @DisplayName("newCouponIssue 성공 시 Coupon 과 CouponIssue 가 저장되고 반환된다")
-        void newCouponIssue_success() {
+        void 신규_쿠폰_발급_성공() {
             // given
             Coupon coupon = Coupon.builder()
                     .couponId(10L)
@@ -128,8 +142,7 @@ public class CouponIssueUseCaseTest {
         }
 
         @Test
-        @DisplayName("존재하지 않는 쿠폰 ID 로 조회 시 NoSuchElementException")
-        void newCouponIssue_notFound() {
+        void 신규_쿠폰_발급_실패_유효하지않은쿠폰() {
             given(couponRepository.findById(50L)).willReturn(Optional.empty());
 
             assertThatThrownBy(() -> couponService.newCouponIssue(1L, 50L))
@@ -138,8 +151,7 @@ public class CouponIssueUseCaseTest {
         }
 
         @Test
-        @DisplayName("남은 수량 없는 쿠폰 발급 시 IllegalStateException")
-        void newCouponIssue_noRemaining() {
+        void 신규_쿠폰_발급_실패_쿠폰수량부족() {
             Coupon coupon = Coupon.builder()
                     .couponId(10L)
                     .remaining(0L)
@@ -151,6 +163,73 @@ public class CouponIssueUseCaseTest {
             assertThatThrownBy(() -> couponService.newCouponIssue(1L, 10L))
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessage("쿠폰 발급에 실패하였습니다.");
+        }
+    }
+
+    @Nested
+    @DisplayName("쿠폰 컨트롤러 테스트")
+    @AutoConfigureMockMvc
+    @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+    class CouponControllerTest {
+
+        @Autowired
+        private MockMvc mockMvc;
+
+        @Autowired
+        private ObjectMapper objectMapper;
+
+        @Autowired
+        private CouponRepository couponRepository;
+
+        private Long savedCouponId;
+        @BeforeEach
+        void setup(){
+            // 테스트용 쿠폰 한 건 저장
+            Coupon domain = Coupon.builder()
+                    .totalIssued(0L)
+                    .remaining(100L)
+                    .discountRate(new BigDecimal("20"))
+                    .expireDate(LocalDateTime.now().plusDays(1))
+                    .updateDt(LocalDateTime.now())
+                    .build();
+
+            CouponJpaEntity saved = CouponJpaEntity.fromDomain(couponRepository.save(domain));
+            savedCouponId = saved.getCouponId();
+        }
+
+
+        @Test
+        @DisplayName("POST /coupons => 200")
+        void 쿠폰_발급_요청_API() throws Exception {
+            // given
+            long userId = 1L;
+            CouponIssueRequest req = new CouponIssueRequest(userId, savedCouponId);
+
+            // when / then
+            mockMvc.perform(post("/coupons")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(req)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.code").value("SUCCESS"))
+                    .andExpect(jsonPath("$.data.couponIssueId").isNotEmpty())
+                    .andExpect(jsonPath("$.data.couponCode").isNotEmpty())
+                    .andExpect(jsonPath("$.data.couponId").value(savedCouponId));
+        }
+
+        @Test
+        @DisplayName("POST /coupons => 404")
+        void 쿠폰_발급_요청_API_실패() throws Exception {
+            // given
+            long userId = 1L;
+            long couponId = 999L;
+            CouponIssueRequest req = new CouponIssueRequest(userId, couponId);
+            // when / then
+            mockMvc.perform(post("/coupons")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(req)))
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.code").value("NOT_FOUND"))
+                    .andExpect(jsonPath("$.message").value("존재하지 않는 쿠폰입니다."));
         }
     }
 
