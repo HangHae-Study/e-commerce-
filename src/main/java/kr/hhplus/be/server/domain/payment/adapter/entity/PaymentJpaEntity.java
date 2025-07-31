@@ -23,8 +23,8 @@ public class PaymentJpaEntity {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(name = "order_id", nullable = false, length = 50)
-    private String orderId;
+    @Column(name = "order_id", nullable = false)
+    private Long orderId;
 
     @Column(name = "total_price", nullable = false, precision = 12, scale = 2)
     private BigDecimal totalPrice;
@@ -47,7 +47,7 @@ public class PaymentJpaEntity {
 
     public static PaymentJpaEntity fromDomain(Payment p) {
         var e = new PaymentJpaEntity();
-        if (p.getPaymentId() != null) e.paymentId = p.getPaymentId();
+        e.paymentId = p.getPaymentId();
         e.userId = p.getUserId();
         e.orderId = p.getOrderId();
         e.totalPrice = p.getTotalPrice();

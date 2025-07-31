@@ -16,7 +16,7 @@ public class PaymentJapRepositoryAdapter implements PaymentRepository {
 
     @Override
     public Optional<Payment> findById(Long aLong) {
-        return Optional.empty();
+        return jpaRepo.findById(aLong).map(PaymentJpaEntity::toDomain);
     }
 
     @Override

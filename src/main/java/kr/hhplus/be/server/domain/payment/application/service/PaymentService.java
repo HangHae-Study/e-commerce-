@@ -14,7 +14,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepo;
 
     @Transactional
-    public Payment pay(Long userId, String orderId, BigDecimal totalPrice) {
+    public Payment pay(Long userId, Long orderId, BigDecimal totalPrice) {
 
         var payment = Payment.of(userId, orderId, totalPrice, "P_CMPL");
 

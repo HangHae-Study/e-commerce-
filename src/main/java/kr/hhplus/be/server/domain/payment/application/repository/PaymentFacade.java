@@ -8,7 +8,10 @@ import kr.hhplus.be.server.domain.payment.application.dto.PaymentRequest;
 import kr.hhplus.be.server.domain.payment.application.dto.PaymentResponse;
 import kr.hhplus.be.server.domain.payment.application.service.PaymentService;
 import kr.hhplus.be.server.domain.product.application.ProductLine;
+import kr.hhplus.be.server.domain.product.application.facade.InventoryFacade;
 import kr.hhplus.be.server.domain.product.application.service.ProductLineService;
+import kr.hhplus.be.server.domain.user.application.Users;
+import kr.hhplus.be.server.domain.user.application.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,52 +23,21 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PaymentFacade {
     private final OrderService orderService;
-    private final ProductLineService productLineService;
+    private final InventoryFacade inventoryFacade;
     private final PaymentService paymentService;
+    private final UserService userService;
 
     @Transactional
     public PaymentResponse process(PaymentRequest req) {
-        /*
-        // 주문 라인 조회
-        Order order = orderService.getOrder(req.orderId());
-        var lines = order.getOrderLines();
-
-        if (lines.isEmpty()) {
-            throw new IllegalArgumentException("유효하지 않은 주문 번호 입니다: " + req.orderId());
-        }
-
-        // 재고 확인
-        Map<Long, ProductLine> stockCountMap = new HashMap<>();
-        for(OrderLine line: lines){
-            Long lId = line.getProductLineId();
-            stockCountMap.put(lId, productLineService.getProductLine(lId));
-        }
-        for (OrderLine line : lines) {
-            ProductLine stock = stockCountMap.get(line.getProductLineId());
-            if (stock.getRemaining() < line.getQuantity()) {
-                throw new IllegalStateException("재고 소진: "+ line.getProductId());
-            }
-        }
-
-        // 잔고 확인
-        //Point point = pointFacade.getPoint(order.getUserId());
-        //if(point.getBalance().compareTo(order.getTotalPrice()) < 0){
-        //    throw new IllegalStateException("잔고 부족");
-        //}
+        Order order = orderService.getOrderByCode(req.orderCode());
 
         try{
-            // 재고 감소
-            for(OrderLine line : lines){
-                ProductLine stock = stockCountMap.get(line.getProductLineId());
-                stock.decreaseStock((long) line.getQuantity());
-                productLineService.updateProductLine(stock);
-            }
+            inventoryFacade.checkStock(order);
 
-            //point.use(order.getTotalPrice());
-            //pointFacade.updateUserPoint(order.getUserId(), order.getTotalPrice());
+            Users used = userService.usePoint(order.getUserId(), order.getTotalPrice());
+
             orderService.orderComplete(order);
 
-            // 결제 시도
             Payment paid = paymentService.pay(
                     order.getUserId(),
                     order.getOrderId(),
@@ -81,11 +53,9 @@ public class PaymentFacade {
             );
         }catch (Exception ex){
             // 복구 로직
+            inventoryFacade.restoreStock(order);
             throw ex;
-        }
-        */
-
-        return null;
+        }// catch(발생 예외별 복구 로직 추가 작성 필요)
     }
 
 }
