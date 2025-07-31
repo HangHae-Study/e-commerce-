@@ -17,7 +17,7 @@ public class OrderJpaRepositoryAdapter implements OrderRepository {
     private final OrderJpaRepository jpaRepository;
 
     @Override
-    public Optional<Order> findById(String orderId) {
+    public Optional<Order> findById(Long orderId) {
         return jpaRepository.findById(orderId)
                 .map(OrderJpaEntity::toDomain);
     }
@@ -37,7 +37,7 @@ public class OrderJpaRepositoryAdapter implements OrderRepository {
     }
 
     @Override
-    public void deleteById(String orderId) {
+    public void deleteById(Long orderId) {
         jpaRepository.deleteById(orderId);
     }
 }

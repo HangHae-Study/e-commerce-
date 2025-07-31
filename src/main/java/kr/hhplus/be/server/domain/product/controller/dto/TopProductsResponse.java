@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.domain.product.controller.apidto;
+package kr.hhplus.be.server.domain.product.controller.dto;
 
 import java.util.List;
 

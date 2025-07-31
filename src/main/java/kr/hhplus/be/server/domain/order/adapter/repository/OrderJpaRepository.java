@@ -9,9 +9,9 @@ import java.util.Optional;
 
 
 @Repository
-public interface OrderJpaRepository extends JpaRepository<OrderJpaEntity, String> {
+public interface OrderJpaRepository extends JpaRepository<OrderJpaEntity, Long> {
 
     //@EntityGraph(attributePaths = "orderLines")
-    Optional<OrderJpaEntity> findById(String id);
+    Optional<OrderJpaEntity> findById(Long id);
 
 }

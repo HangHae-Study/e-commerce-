@@ -18,7 +18,10 @@ import java.util.List;
 @NoArgsConstructor
 public class OrderJpaEntity {
     @Id
-    private String orderId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long orderId;
+
+    private String orderCode;
 
     @Column(nullable = false)
     private Long userId;
@@ -51,6 +54,7 @@ public class OrderJpaEntity {
         //List<OrderLine> lines = orderLines.stream().map(OrderLineJpaEntity::toDomain).toList();
         return Order.builder()
                 .orderId(orderId)
+                .orderCode(orderCode)
                 .userId(userId)
                 .totalPrice(totalPrice)
                 //.orderLines(lines)

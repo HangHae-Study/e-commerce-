@@ -25,6 +25,7 @@ public class PaymentFacade {
 
     @Transactional
     public PaymentResponse process(PaymentRequest req) {
+        /*
         // 주문 라인 조회
         Order order = orderService.getOrder(req.orderId());
         var lines = order.getOrderLines();
@@ -82,6 +83,9 @@ public class PaymentFacade {
             // 복구 로직
             throw ex;
         }
+        */
+
+        return null;
     }
 
 }

@@ -5,6 +5,6 @@ import kr.hhplus.be.server.domain.order.application.Order;
 import org.springframework.stereotype.Repository;
 
 
-public interface OrderRepository extends RepositoryPort<String, Order> {
+public interface OrderRepository extends RepositoryPort<Long, Order> {
 
 }

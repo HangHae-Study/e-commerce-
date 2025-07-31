@@ -2,6 +2,7 @@ package kr.hhplus.be.server.domain.coupon;
 
 import kr.hhplus.be.server.domain.coupon.application.CouponIssue;
 import kr.hhplus.be.server.domain.coupon.application.repository.CouponIssueRepository;
+import kr.hhplus.be.server.domain.coupon.testinstance.CouponIssueTestInstance;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -11,7 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;

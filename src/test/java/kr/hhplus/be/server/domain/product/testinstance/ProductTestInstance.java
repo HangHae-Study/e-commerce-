@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.domain.product;
+package kr.hhplus.be.server.domain.product.testinstance;
 
 
 import kr.hhplus.be.server.domain.product.application.Product;

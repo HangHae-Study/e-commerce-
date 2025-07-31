@@ -2,7 +2,7 @@ package kr.hhplus.be.server.domain.product.controller;
 
 import kr.hhplus.be.server.common.api.ApiResponse;
 import kr.hhplus.be.server.domain.product.application.facade.ProductFacade;
-import kr.hhplus.be.server.domain.product.controller.apidto.*;
+import kr.hhplus.be.server.domain.product.controller.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

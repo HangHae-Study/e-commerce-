@@ -2,6 +2,7 @@ package kr.hhplus.be.server.domain.coupon;
 
 import kr.hhplus.be.server.domain.coupon.application.Coupon;
 import kr.hhplus.be.server.domain.coupon.application.repository.CouponRepository;
+import kr.hhplus.be.server.domain.coupon.testinstance.CouponTestInstance;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

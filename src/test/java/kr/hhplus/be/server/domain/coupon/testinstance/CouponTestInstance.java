@@ -1,7 +1,6 @@
-package kr.hhplus.be.server.domain.coupon;
+package kr.hhplus.be.server.domain.coupon.testinstance;
 
 import kr.hhplus.be.server.domain.coupon.application.Coupon;
-import kr.hhplus.be.server.domain.coupon.application.CouponIssue;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

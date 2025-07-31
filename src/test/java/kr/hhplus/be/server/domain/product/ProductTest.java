@@ -7,8 +7,9 @@ import kr.hhplus.be.server.domain.product.application.repository.ProductLineRepo
 import kr.hhplus.be.server.domain.product.application.repository.ProductRepository;
 import kr.hhplus.be.server.domain.product.application.service.ProductLineService;
 import kr.hhplus.be.server.domain.product.application.service.ProductService;
-import kr.hhplus.be.server.domain.product.controller.apidto.ProductDetailResponse;
-import kr.hhplus.be.server.domain.product.controller.apidto.ProductListResponse;
+import kr.hhplus.be.server.domain.product.controller.dto.ProductDetailResponse;
+import kr.hhplus.be.server.domain.product.controller.dto.ProductListResponse;
+import kr.hhplus.be.server.domain.product.testinstance.ProductTestInstance;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,7 +24,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
 import java.util.List;

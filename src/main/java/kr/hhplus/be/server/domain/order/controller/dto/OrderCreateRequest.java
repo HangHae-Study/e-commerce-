@@ -1,10 +1,11 @@
-package kr.hhplus.be.server.domain.order.application.dto;
+package kr.hhplus.be.server.domain.order.controller.dto;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 public record OrderCreateRequest(
-        String orderId,
+        Long orderId,
+        String orderCode,
         Long userId,
         BigDecimal totalPrice,
         List<OrderItem> items,

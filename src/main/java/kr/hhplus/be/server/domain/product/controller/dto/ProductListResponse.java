@@ -1,6 +1,4 @@
-package kr.hhplus.be.server.domain.product.controller.apidto;
-
-import lombok.Data;
+package kr.hhplus.be.server.domain.product.controller.dto;
 
 import java.math.BigDecimal;
 import java.util.List;

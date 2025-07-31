@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.domain.coupon;
+package kr.hhplus.be.server.domain.coupon.testinstance;
 
 import kr.hhplus.be.server.domain.coupon.application.CouponIssue;
 
