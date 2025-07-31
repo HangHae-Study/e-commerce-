@@ -3,12 +3,15 @@ package kr.hhplus.be.server.domain.user.adapter.entity;
 import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.user.application.Users;
 import kr.hhplus.be.server.domain.user.application.dto.PointDao;
+import lombok.Getter;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+@Table(name="points")
+@Getter
 @Entity
 public class PointJpaEntity {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
