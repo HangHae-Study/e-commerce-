@@ -1,144 +1,209 @@
 package kr.hhplus.be.server.domain.payment;
 
-import kr.hhplus.be.server.domain.order.application.Order;
-import kr.hhplus.be.server.domain.order.application.repository.OrderRepository;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Collections;
+import java.util.Optional;
+
 import kr.hhplus.be.server.domain.order.application.service.OrderService;
+import kr.hhplus.be.server.domain.payment.application.Payment;
 import kr.hhplus.be.server.domain.payment.application.dto.PaymentRequest;
 import kr.hhplus.be.server.domain.payment.application.dto.PaymentResponse;
 import kr.hhplus.be.server.domain.payment.application.repository.PaymentFacade;
 import kr.hhplus.be.server.domain.payment.application.repository.PaymentRepository;
-import kr.hhplus.be.server.domain.product.application.repository.ProductLineRepository;
-import kr.hhplus.be.server.domain.product.application.service.ProductLineService;
-import kr.hhplus.be.server.domain.user.application.Users;
-import kr.hhplus.be.server.domain.user.application.repository.PointRepository;
-import kr.hhplus.be.server.domain.user.application.repository.UserRepository;
+import kr.hhplus.be.server.domain.payment.application.service.PaymentService;
+import kr.hhplus.be.server.domain.product.application.facade.InventoryFacade;
+import kr.hhplus.be.server.domain.user.application.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import kr.hhplus.be.server.domain.order.application.Order;
+import kr.hhplus.be.server.domain.user.application.Users;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
+public class PaymentTest{
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+    @Nested
+    @DisplayName("결제 Service & Repository 테스트")
+    @SpringBootTest
+    @Transactional
+    class PaymentServiceIntegrationTest {
 
-@SpringBootTest
-@Transactional
-class PaymentFacadeIntegrationTest {
-/*
-    @Autowired
-    PaymentFacade paymentFacade;
+        @Autowired
+        private PaymentService paymentService;
 
-    @Autowired
-    OrderService orderService;
-    @Autowired
-    OrderRepository orderRepository;
+        @Autowired
+        private PaymentRepository paymentRepository;
 
-    @Autowired
-    ProductLineService productLineService;
-    @Autowired
-    ProductLineRepository productLineRepository;
+        @Test
+        void 결제요청_성공_Repo_저장확인() {
+            // --- when ---
+            Long userId     = 42L;
+            Long orderId    = 77L;
+            BigDecimal amount = new BigDecimal("123.45");
 
-    @Autowired
-    UserRepository userRepository;
+            Payment result = paymentService.pay(userId, orderId, amount);
 
-    //@Autowired
-    //UserPointFacade pointFacade;
-    @Autowired
-    PointRepository pointRepository;
+            // --- then ---
+            // 1) 저장된 ID 가 생성되었는지
+            assertThat(result.getPaymentId()).isNotNull();
 
-    @Autowired
-    PaymentRepository paymentRepository;
+            // 2) 반환된 객체의 필드들이 요청값과 일치하는지
+            assertThat(result.getUserId()).isEqualTo(userId);
+            assertThat(result.getOrderId()).isEqualTo(orderId);
+            assertThat(result.getTotalPrice()).isEqualByComparingTo(amount);
+            assertThat(result.getStatus()).isEqualTo("P_CMPL");
 
-    private Long productLineId1;
-    private Long productLineId2;
-    private BigDecimal productLinePrice1;
-    private BigDecimal productLinePrice2;
+            // 3) 실제 DB 에도 동일한 값이 저장되었는지 조회해 검증
+            Optional<Payment> fromDbOpt = paymentRepository.findById(result.getPaymentId());
+            assertThat(fromDbOpt).isPresent();
 
-    @BeforeEach
-    void 세팅() {
-        // 기본 데이터 삽입 - 필요시 초기화
+            Payment fromDb = fromDbOpt.get();
+            assertThat(fromDb.getPaymentId()).isEqualTo(result.getPaymentId());
+            assertThat(fromDb.getUserId()).isEqualTo(userId);
+            assertThat(fromDb.getOrderId()).isEqualTo(orderId);
+            assertThat(fromDb.getTotalPrice()).isEqualByComparingTo(amount);
+            assertThat(fromDb.getStatus()).isEqualTo("P_CMPL");
+        }
     }
 
-    @Test
-    void 결제_정상_처리된다() {
-        // given
-        Long userId = 1L;
-        String orderId = "ORDER_MOCK_ID";
 
-        var pp = TestInstance.PersistProduct.getPersistProduct();
-        var line1 = productLineRepository.save(pp.productLine1);
-        var line2 = productLineRepository.save(pp.productLine2);
-        productLineId1 = line1.getProductLineId();
-        productLineId2 = line2.getProductLineId();
-        productLinePrice1 = line1.getProductLinePrice();
-        productLinePrice2 = line2.getProductLinePrice();
+    @Nested
+    @ExtendWith(MockitoExtension.class)
+    @DisplayName("결제 퍼사드(서비스) 테스트")
+    class PaymentFacadeTest{
+        @Mock
+        OrderService orderService;
+        @Mock
+        InventoryFacade inventoryFacade;
+        @Mock
+        UserService userService;
+        @Mock
+        PaymentService paymentService;
 
-        TestInstance.PersistPayment payInfo = new TestInstance.PersistPayment();
-        Order order = payInfo.orderData;
+        @InjectMocks
+        private PaymentFacade paymentFacade;
 
-        orderRepository.save(order);
+        private PaymentRequest req;
+        private Order order;
 
-        // 포인트 충전
-        //userRepository.save(new Users(1L));
-       // pointRepository.save(new Point(userId, BigDecimal.valueOf(70000.0)));
-
-        // 재고 등록
-        productLineRepository.save(line1);
-        productLineRepository.save(line2);
-
-        // when
-        PaymentResponse response = paymentFacade.process(new PaymentRequest(orderId));
-
-        // then
-        assertThat(response.paymentStatus()).isEqualTo("P_CMPL");
-
-    }
-
-    /*
-    @Test
-    void 잔고_부족_시_예외() {
-        // given
-        Long userId = 2L;
-        String orderId = "ORD-NO-POINT";
-        BigDecimal price = BigDecimal.valueOf(5000);
-
-        Order order = TestOrderFactory.create(orderId, userId, price);
-        orderRepository.save(order);
-
-        pointRepository.save(new Point(userId, BigDecimal.valueOf(1000)));
-
-        for (OrderLine line : order.getOrderLines()) {
-            productLineRepository.save(new ProductLine(line.getProductLineId(), 10L));
+        @BeforeEach
+        void setUp() {
+            // 공통 리퀘스트, 도메인 객체 준비
+            req = new PaymentRequest("ORD-ABC-123");
+            order = Order.builder()
+                    .orderId(42L)
+                    .orderCode(req.orderCode())
+                    .userId(7L)
+                    .totalPrice(new BigDecimal("1500"))
+                    .orderLines(Collections.emptyList())
+                    .status("O_MAKE")
+                    .build();
         }
 
-        // when & then
-        assertThatThrownBy(() -> paymentFacade.process(new PaymentRequest(userId.toString(), orderId)))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("잔고 부족");
-    }
+        @Test
+        void 정상_결제_처리_주문상태변경_결제정보반환() {
+            // given
+            Payment paid = Payment.builder()
+                    .paymentId(99L)
+                    .orderId(order.getOrderId())
+                    .userId(order.getUserId())
+                    .paymentDt(LocalDateTime.now())
+                    .totalPrice(order.getTotalPrice())
+                    .status("P_CMPL")
+                    .build();
 
-    @Test
-    void 재고_부족_시_예외() {
-        // given
-        Long userId = 3L;
-        String orderId = "ORD-NO-STOCK";
-        BigDecimal price = BigDecimal.valueOf(1000);
+            given(orderService.getOrderByCode(req.orderCode())).willReturn(order);
+            willDoNothing().given(inventoryFacade).checkStock(order);
+            given(userService.usePoint(order.getUserId(), order.getTotalPrice()))
+                    .willReturn(Users.builder().userId(order.getUserId())
+                            .balance(new BigDecimal("500"))
+                            .build());
+            // orderComplete
+            willDoNothing().given(orderService).orderComplete(order);
+            given(paymentService.pay(order.getUserId(), order.getOrderId(), order.getTotalPrice()))
+                    .willReturn(paid);
 
-        Order order = TestOrderFactory.create(orderId, userId, price);
-        orderRepository.save(order);
+            // when
+            PaymentResponse resp = paymentFacade.process(req);
 
-        pointRepository.save(new Point(userId, BigDecimal.valueOf(2000)));
-
-        for (OrderLine line : order.getOrderLines()) {
-            productLineRepository.save(new ProductLine(line.getProductLineId(), 0L)); // 재고 0
+            // then
+            assertThat(resp.paymentId()).isEqualTo(99L);
+            assertThat(resp.orderId()).isEqualTo(42L);
+            assertThat(resp.totalPrice()).isEqualByComparingTo(new BigDecimal("1500"));
+            assertThat(resp.paymentStatus()).isEqualTo("P_CMPL");
+            // orderComplete 호출
+            verify(orderService, times(1)).orderComplete(order);
+            // 복구 로직은 호출되지 않아야 함
+            verify(inventoryFacade, never()).restoreStock(any());
         }
 
-        // when & then
-        assertThatThrownBy(() -> paymentFacade.process(new PaymentRequest(userId.toString(), orderId)))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("재고 소진");
+        // 결제시패(주문실패) 상태
+        @Test
+        void 재고_부족_예외_검증() {
+            given(orderService.getOrderByCode(req.orderCode())).willReturn(order);
+            willThrow(new IllegalStateException("재고가 부족합니다."))
+                    .given(inventoryFacade).checkStock(order);
+
+            assertThatThrownBy(() -> paymentFacade.process(req))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessage("재고가 부족합니다.");
+
+            verify(inventoryFacade).restoreStock(order);
+            verify(orderService, never()).orderComplete(any());
+            verify(userService, never()).usePoint(anyLong(), any());
+            verify(paymentService, never()).pay(anyLong(), anyLong(), any());
+        }
+
+        @Test
+        void 포인트_부족_예외_검증() {
+            given(orderService.getOrderByCode(req.orderCode())).willReturn(order);
+            willDoNothing().given(inventoryFacade).checkStock(order);
+            willThrow(new IllegalStateException("잔액이 부족합니다."))
+                    .given(userService).usePoint(order.getUserId(), order.getTotalPrice());
+
+            assertThatThrownBy(() -> paymentFacade.process(req))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessage("잔액이 부족합니다.");
+
+            verify(inventoryFacade).restoreStock(order);
+            verify(orderService, never()).orderComplete(any());
+            verify(paymentService, never()).pay(anyLong(), anyLong(), any());
+        }
+
+        @Test
+        void 결제_실패_복구_호출() {
+            given(orderService.getOrderByCode(req.orderCode())).willReturn(order);
+            willDoNothing().given(inventoryFacade).checkStock(order);
+            given(userService.usePoint(order.getUserId(), order.getTotalPrice()))
+                    .willReturn(Users.builder().userId(order.getUserId())
+                            .balance(new BigDecimal("500"))
+                            .build());
+            willDoNothing().given(orderService).orderComplete(order);
+            willThrow(new RuntimeException("결제 시스템 장애"))
+                    .given(paymentService).pay(order.getUserId(), order.getOrderId(), order.getTotalPrice());
+
+            assertThatThrownBy(() -> paymentFacade.process(req))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessage("결제 시스템 장애");
+
+            // stock 복구
+            verify(inventoryFacade).restoreStock(order);
+            // orderComplete 은 결제 직전에 이미 호출됨
+            verify(orderService).orderComplete(order);
+        }
     }
-     */
 }
