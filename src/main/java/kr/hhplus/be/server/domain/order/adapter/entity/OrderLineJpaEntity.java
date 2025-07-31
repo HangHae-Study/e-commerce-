@@ -7,10 +7,18 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "order_lines")
+@Table(
+        name = "order_lines",
+        indexes = {
+                @Index(
+                        name = "idx_status_orderyyyy",
+                        columnList = "status, order_YYMMDD"
+                )
+        })
 @Getter
 @NoArgsConstructor
 public class OrderLineJpaEntity {
@@ -48,6 +56,9 @@ public class OrderLineJpaEntity {
             columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP"
     )
     private LocalDateTime orderDt;
+
+    @Column(name = "order_YYMMDD", nullable = false)
+    private LocalDate orderYYMMDD;
 
     @UpdateTimestamp
     @Column(
