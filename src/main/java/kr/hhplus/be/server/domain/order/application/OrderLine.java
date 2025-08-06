@@ -13,23 +13,23 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class OrderLine {
-    private final Long orderLineId;
-    private final String orderId;
+    private Long orderLineId;
+    private String orderId;
 
-    private final Long userId;
-    private final Long productId;
-    private final Long productLineId;
+    private Long userId;
+    private Long productId;
+    private Long productLineId;
 
-    private final BigDecimal orderLinePrice;
-    private final int quantity;
+    private BigDecimal orderLinePrice;
+    private int quantity;
 
     private String couponYn;
     private String couponCode;
     private BigDecimal discountPrice;
 
-    private final String status;
-    private final LocalDateTime orderDt;
-    private final LocalDateTime updateDt;
+    private String status;
+    private LocalDateTime orderDt;
+    private LocalDateTime updateDt;
 
     public BigDecimal getSubtotal() {
         return orderLinePrice.multiply(new BigDecimal(quantity));
@@ -69,5 +69,8 @@ public class OrderLine {
         return ord;
     }
 
+    public void complete() {
+        setStatus("O_CMPL");
+    }
 }
 

@@ -1,11 +1,13 @@
 package kr.hhplus.be.server.domain.product.application.service;
 
+import kr.hhplus.be.server.domain.product.application.Product;
 import kr.hhplus.be.server.domain.product.application.ProductLine;
 import kr.hhplus.be.server.domain.product.application.repository.ProductLineRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -15,4 +17,16 @@ public class ProductLineService {
     public List<ProductLine> getProductLineList(Long productId){
         return productLineRepository.findByProductId(productId);
     }
+
+    public ProductLine getProductLine(Long productId){
+        return productLineRepository.findById(productId)
+                .orElseThrow(() -> new NoSuchElementException("올바르지 않은 상품입니다"));
+    }
+
+    public void decrease(ProductLine product){
+        productLineRepository.save(product);
+    }
+
+
+
 }

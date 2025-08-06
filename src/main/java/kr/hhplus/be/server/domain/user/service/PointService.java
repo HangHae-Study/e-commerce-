@@ -5,6 +5,7 @@ import kr.hhplus.be.server.domain.user.repository.PointRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.NoSuchElementException;
 
 @Service
@@ -33,6 +34,13 @@ public class PointService {
         Point point = getPoint(userId);
 
         point.charge(amount);
+        pointRepository.save(point);
+        return point;
+    }
+
+    public Point use(Long userId, Object amount){
+        Point point = getPoint(userId);
+        point.use(amount);
         pointRepository.save(point);
         return point;
     }

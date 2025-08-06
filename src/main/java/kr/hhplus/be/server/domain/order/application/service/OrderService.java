@@ -59,4 +59,9 @@ public class OrderService {
     }
 
 
+    public void orderComplete(Order order) {
+        // O_MAKE -> O_CMPL;
+        order.complete();
+        order.getOrderLines().forEach(OrderLine::complete);
+    }
 }

@@ -142,4 +142,47 @@ public class TestInstance {
             return new PersistOrder();
         }
     }
+
+    public static class PersistPayment{
+        public List<OrderLine> oLineData = List.of(
+                        OrderLine.builder()
+                                //.orderLineId((long) i)
+                                .orderId("ORDER_MOCK_ID")
+                                .userId(1L)
+                                .productId(1L)
+                                .productLineId((long)1)
+                                .orderLinePrice(BigDecimal.valueOf(31000).multiply(BigDecimal.valueOf(1)))
+                                .quantity(1)
+                                .status("O_MAKE")
+                                .orderDt(LocalDateTime.now())
+                                .updateDt(LocalDateTime.now())
+                                .build(),
+                        OrderLine.builder()
+                                //.orderLineId((long) i)
+                                .orderId("ORDER_MOCK_ID")
+                                .userId(1L)
+                                .productId(1L)
+                                .productLineId((long)2)
+                                .orderLinePrice(BigDecimal.valueOf(34000).multiply(BigDecimal.valueOf((1))))
+                                .quantity(1)
+                                .status("O_MAKE")
+                                .orderDt(LocalDateTime.now())
+                                .updateDt(LocalDateTime.now())
+                                .build()
+        );
+
+        public Order orderData = Order.builder()
+                .orderId("ORDER_MOCK_ID")
+                .userId(1L)
+                .totalPrice(BigDecimal.valueOf(64000))
+                .orderDt(LocalDateTime.now())
+                .status("O_MAKE")
+                .updateDt(LocalDateTime.now())
+                .orderLines(oLineData)
+                .build();
+
+        public static PersistOrder getPersistOrder(){
+            return new PersistOrder();
+        }
+    }
 }
