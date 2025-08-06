@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
         indexes = {
                 @Index(
                         name = "idx_status_orderyyyy",
-                        columnList = "status, order_YYMMDD"
+                        columnList = "status, order_yymmdd"
                 )
         })
 @Getter
@@ -35,7 +35,7 @@ public class OrderLineJpaEntity {
     //@Column(nullable = false)
     //private Long productId;
 
-    @Column(nullable = false)
+    @Column
     private Long productLineId;
 
     @Column(precision = 12, scale = 2)
@@ -48,7 +48,11 @@ public class OrderLineJpaEntity {
     @Column(precision = 12, scale = 2)
     private BigDecimal disCountPrice;
 
-    @Column(nullable=false)
+    @Column(
+            length = 10,
+            nullable=false,
+            columnDefinition = "VARCHAR(10) DEFAULT 'O_MAKE'"
+    )
     private String status;
 
     @Column(
@@ -57,7 +61,9 @@ public class OrderLineJpaEntity {
     )
     private LocalDateTime orderDt;
 
-    @Column(name = "order_YYMMDD", nullable = false)
+    @Column(
+            name = "order_yymmdd"
+    )
     private LocalDate orderYYMMDD;
 
     @UpdateTimestamp

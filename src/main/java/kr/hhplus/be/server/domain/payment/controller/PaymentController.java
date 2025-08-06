@@ -1,16 +1,11 @@
 package kr.hhplus.be.server.domain.payment.controller;
 
-import kr.hhplus.be.server.common.api.ApiResponse;
 import kr.hhplus.be.server.domain.payment.application.dto.PaymentRequest;
 import kr.hhplus.be.server.domain.payment.application.dto.PaymentResponse;
-import kr.hhplus.be.server.domain.payment.application.repository.PaymentFacade;
+import kr.hhplus.be.server.domain.payment.application.facade.PaymentFacade;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.Date;
 
 @RestController
 @RequiredArgsConstructor

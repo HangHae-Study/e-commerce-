@@ -2,11 +2,9 @@ package kr.hhplus.be.server.domain.payment;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -14,7 +12,7 @@ import kr.hhplus.be.server.domain.order.application.service.OrderService;
 import kr.hhplus.be.server.domain.payment.application.Payment;
 import kr.hhplus.be.server.domain.payment.application.dto.PaymentRequest;
 import kr.hhplus.be.server.domain.payment.application.dto.PaymentResponse;
-import kr.hhplus.be.server.domain.payment.application.repository.PaymentFacade;
+import kr.hhplus.be.server.domain.payment.application.facade.PaymentFacade;
 import kr.hhplus.be.server.domain.payment.application.repository.PaymentRepository;
 import kr.hhplus.be.server.domain.payment.application.service.PaymentService;
 import kr.hhplus.be.server.domain.product.application.facade.InventoryFacade;

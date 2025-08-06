@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.product.application;
 
+import kr.hhplus.be.server.domain.product.exception.OutOfStockException;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.repository.query.ParameterOutOfBoundsException;
@@ -25,7 +26,7 @@ public class ProductLine {
         }
 
         if (quantity > remaining) {
-            throw new IllegalArgumentException("재고가 부족합니다. (요청 수량: " + quantity + ", 남은 수량: " + remaining + ")");
+            throw new OutOfStockException(productLineId, quantity, remaining);
         }
         remaining -= quantity;
     }

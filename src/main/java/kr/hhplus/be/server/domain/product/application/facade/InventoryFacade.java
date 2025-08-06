@@ -6,6 +6,9 @@ import kr.hhplus.be.server.domain.product.application.service.ProductLineService
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class InventoryFacade {
@@ -15,7 +18,7 @@ public class InventoryFacade {
     public void checkStock(Order order) {
         order.getOrderLines().forEach(line -> {
             ProductLine pl = productLineService.getProductLine(line.getProductLineId());
-            pl.decreaseStock((long) line.getQuantity());  // domain 메서드 안에서 부족하면 IllegalStateException
+            pl.decreaseStock((long) line.getQuantity());  // domain 메서드 안에서 부족하면 OutOfStockeException
             productLineService.updateProductLine(pl);
         });
     }

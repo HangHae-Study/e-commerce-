@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.user.application;
 
+import kr.hhplus.be.server.domain.user.exception.InsufficientBalanceException;
 import lombok.Builder;
 import lombok.Data;
 
@@ -40,7 +41,7 @@ public class Users {
         BigDecimal amt = new BigDecimal(amount.toString());
 
         if(amt.compareTo(balance) > 0){
-            throw new IllegalArgumentException("현재 잔액이 부족합니다");
+            throw new InsufficientBalanceException(userId, balance, amt);
         }
 
         this.balance = this.balance.subtract(amt);
