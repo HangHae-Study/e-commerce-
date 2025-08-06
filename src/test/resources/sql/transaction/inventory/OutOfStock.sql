@@ -15,9 +15,9 @@ INSERT INTO product (product_id, product_name, product_price) VALUES
 INSERT INTO product_line (
     product_line_id, product_id, product_line_name, product_line_price, product_line_type, remaining
 ) VALUES
-      (1, 1, 'Line-1', 10.00, 'TYPE', 1),
-      (2, 1, 'Line-2', 20.00, 'TYPE', 1),
-      (3, 1, 'Line-3', 30.00, 'TYPE', 2);
+      (1, 1, 'Line-1', 10.00, 'TYPE', 2),
+      (2, 1, 'Line-2', 20.00, 'TYPE', 2),
+      (3, 1, 'Line-3', 30.00, 'TYPE', 1);
 
 -- 3) User1 주문 시도 (각 2개) — 재고 부족으로 비즈니스 로직에서 실패
 INSERT INTO orders (order_id, order_code, user_id, total_price, order_dt, status) VALUES
@@ -33,7 +33,7 @@ INSERT INTO order_lines (
 
 -- 4) User2 주문 (각 1개) — 재고 충분으로 성공
 INSERT INTO orders (order_id, order_code, user_id, total_price, order_dt, status) VALUES
-    (1002, 'ORD-2-SUCC', 2, (1*10.00 + 1*20.00 + 1*30.00), '2025-08-01 10:00:00', 'O_CMPL');
+    (1002, 'ORD-2-SUCC', 2, (1*10.00 + 1*20.00 + 1*30.00), '2025-08-01 10:00:00', 'O_MAKE');
 
 INSERT INTO order_lines (
     order_line_id, order_id, user_id, product_line_id,

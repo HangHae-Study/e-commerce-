@@ -5,6 +5,7 @@ import kr.hhplus.be.server.domain.product.application.ProductLine;
 import kr.hhplus.be.server.domain.product.application.repository.ProductLineRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -23,8 +24,10 @@ public class ProductLineService {
                 .orElseThrow(() -> new NoSuchElementException("올바르지 않은 상품입니다"));
     }
 
-    public void updateProductLine(ProductLine product){
-        productLineRepository.save(product);
+
+    @Transactional
+    public ProductLine updateProductLine(ProductLine product){
+        return productLineRepository.save(product);
     }
 
 }

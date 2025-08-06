@@ -11,6 +11,7 @@ import kr.hhplus.be.server.domain.product.application.ProductLine;
 import kr.hhplus.be.server.domain.product.application.facade.InventoryFacade;
 import kr.hhplus.be.server.domain.product.application.service.ProductLineService;
 import kr.hhplus.be.server.domain.product.exception.OutOfStockException;
+import kr.hhplus.be.server.domain.product.exception.RestoreOutOfStockException;
 import kr.hhplus.be.server.domain.user.application.Users;
 import kr.hhplus.be.server.domain.user.application.service.UserService;
 import kr.hhplus.be.server.domain.user.exception.InsufficientBalanceException;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,10 +32,8 @@ public class PaymentFacade {
     private final PaymentService paymentService;
     private final UserService userService;
 
-    @Transactional
     public PaymentResponse process(PaymentRequest req) {
         Order order = orderService.getOrderByCode(req.orderCode());
-
         try{
             // 재고 주문 요청 수량 만큼 감소된 아이템들
             inventoryFacade.checkStock(order);
@@ -55,14 +55,14 @@ public class PaymentFacade {
                     paid.getPaymentDt().toString(),
                     paid.getStatus()
             );
-        }catch(OutOfStockException outEx){
+        }catch(RestoreOutOfStockException restEx){
             // 복구 로직 - 5개중 4개만 업데이트 되었다면, 4개만 되돌리기?
-
-            throw outEx;
+            inventoryFacade.restoreStock(restEx.getSucceededLines(), 0);
+            throw new IllegalStateException("재고가 부족하여 결제에 실패하였습니다.");
         }catch (InsufficientBalanceException ex){
             // 복구 로직
-            inventoryFacade.restoreStock(order);
-            throw ex;
+            inventoryFacade.restoreStock(order.getOrderLines(), 0);
+            throw new IllegalStateException("잔고가 부족하여 결제에 실패하였습니다.");
         }
     }
 

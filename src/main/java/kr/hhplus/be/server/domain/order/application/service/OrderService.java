@@ -41,6 +41,8 @@ public class OrderService {
     }
 
 
+
+    @Transactional
     public void orderComplete(Order order) {
         order.complete();
         for (OrderLine orderLine : order.getOrderLines()) {
