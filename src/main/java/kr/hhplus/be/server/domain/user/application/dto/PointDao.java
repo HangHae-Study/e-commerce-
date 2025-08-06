@@ -12,5 +12,5 @@ public class PointDao {
     private Long pointId;
     private Long userId;
     private BigDecimal balance;
-    private LocalDateTime udpateDt;
+    private LocalDateTime updateDt;
 }

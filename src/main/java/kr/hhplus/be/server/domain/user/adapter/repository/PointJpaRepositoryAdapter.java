@@ -34,7 +34,7 @@ public class PointJpaRepositoryAdapter implements PointRepository {
 
     @Override
     public PointDao save(PointDao point) {
-        return null;
+        return pointJpaRepository.save(PointJpaEntity.fromDomain(point)).toDao();
     }
 
     @Override
