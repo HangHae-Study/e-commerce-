@@ -2,30 +2,30 @@ package kr.hhplus.be.server.domain.user.controller;
 
 import jakarta.validation.Valid;
 import kr.hhplus.be.server.common.api.ApiResponse;
-import kr.hhplus.be.server.domain.user.dto.BalanceChargeRequest;
-import kr.hhplus.be.server.domain.user.dto.BalanceChargeResponse;
-import kr.hhplus.be.server.domain.user.dto.BalanceInquiryResponse;
-import kr.hhplus.be.server.domain.user.entity.Point;
-import kr.hhplus.be.server.domain.user.facade.UserPointFacade;
+import kr.hhplus.be.server.domain.user.application.Users;
+import kr.hhplus.be.server.domain.user.application.service.UserService;
+import kr.hhplus.be.server.domain.user.controller.dto.BalanceChargeRequest;
+import kr.hhplus.be.server.domain.user.controller.dto.BalanceChargeResponse;
+import kr.hhplus.be.server.domain.user.controller.dto.BalanceInquiryResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
+
+import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/points")
 @RequiredArgsConstructor
 public class PointController {
 
-    private final UserPointFacade userPointFacade;
+    private final UserService userService;
 
     @GetMapping("/{userId}")
     public ResponseEntity<ApiResponse<BalanceInquiryResponse>> getBalance(@PathVariable Long userId) {
 
-        Point point = userPointFacade.getPoint(userId);
+        BigDecimal point = userService.getPoint(userId);
 
-        BalanceInquiryResponse data = new BalanceInquiryResponse(point.getUserId(), point.getBalance());
+        BalanceInquiryResponse data = new BalanceInquiryResponse(userId, point);
 
         return ResponseEntity.ok(ApiResponse.success(data));
     }
@@ -35,9 +35,9 @@ public class PointController {
             @PathVariable Long userId,
             @Valid @RequestBody BalanceChargeRequest req) {
 
-        Point point = userPointFacade.chargeUserPoint(userId, req.amount());
+        Users user = userService.chargePoint(userId, req.amount());
 
-        BalanceChargeResponse data = new BalanceChargeResponse(point.getUserId(), point.getBalance());
+        BalanceChargeResponse data = new BalanceChargeResponse(user.getUserId(), user.getBalance());
 
         return ResponseEntity.ok(ApiResponse.success(data));
     }

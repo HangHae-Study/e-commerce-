@@ -3,6 +3,7 @@ package kr.hhplus.be.server.domain.order.application.service;
 import kr.hhplus.be.server.domain.coupon.application.CouponIssue;
 import kr.hhplus.be.server.domain.order.application.Order;
 import kr.hhplus.be.server.domain.order.application.OrderLine;
+import kr.hhplus.be.server.domain.order.controller.dto.OrderCreateRequest;
 import kr.hhplus.be.server.domain.order.application.repository.OrderLineRepository;
 import kr.hhplus.be.server.domain.order.application.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,47 +22,31 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderLineRepository orderLineRepository;
 
-    public Order getOrder(String orderId){
-        Order order =  orderRepository.findById(orderId)
-                .orElseThrow(() -> new NoSuchElementException("유효하지 않은 주문 정보입니다."));
+    public Order createOrder(Order order) {
+        Order newOrder = orderRepository.save(order);
 
-        List<OrderLine> lines = orderLineRepository.findByOrderId(order);
-        return order.toBuilder()
-                .orderLines(lines)
-                .build();
+        return newOrder;
     }
 
-    public Order createOrder(Order ordReq){
-        Order order = orderRepository.save(ordReq);
-        List<OrderLine> lines = orderLineRepository.findByOrderId(order);
-        return order.toBuilder()
-                .orderLines(lines)
-                .build();
+    public Order getOrder(Long orderId){
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new NoSuchElementException("올바르지 않은 주문 입니다"));
+        return order;
     }
 
-    public Order createOrder(Order nOrder, CouponIssue ci){
-        nOrder.getOrderLines().forEach(line -> line.applyCoupon(ci));
-
-        BigDecimal newTotal = nOrder.getOrderLines().stream()
-                .map(OrderLine::getDiscountPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        Order updated = Order.builder()
-                .orderId(nOrder.getOrderId())
-                .userId(nOrder.getUserId())
-                .totalPrice(newTotal)
-                .orderLines(nOrder.getOrderLines())
-                .orderDt(nOrder.getOrderDt())
-                .status(nOrder.getStatus())
-                .updateDt(LocalDateTime.now())
-                .build();
-        return createOrder(updated);
+    public Order getOrderByCode(String orderCode){
+        Order order = orderRepository.findByOrderCode(orderCode)
+                .orElseThrow(() -> new NoSuchElementException("올바르지 않은 주문 입니다"));
+        return order;
     }
 
 
     public void orderComplete(Order order) {
-        // O_MAKE -> O_CMPL;
         order.complete();
-        order.getOrderLines().forEach(OrderLine::complete);
+        for (OrderLine orderLine : order.getOrderLines()) {
+            orderLine.complete();
+        }
+
+        orderRepository.save(order);
     }
 }

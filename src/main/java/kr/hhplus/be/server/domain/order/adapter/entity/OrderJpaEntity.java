@@ -18,16 +18,27 @@ import java.util.List;
 @NoArgsConstructor
 public class OrderJpaEntity {
     @Id
-    private String orderId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long orderId;
 
+    private String orderCode;
+
+    @Column(nullable = false)
     private Long userId;
 
+    @Column(precision = 12, scale = 2)
     private BigDecimal totalPrice;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<OrderLineJpaEntity> orderLines = new ArrayList<>();
 
+    @Column(
+            nullable = false,
+            columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP"
+    )
     private LocalDateTime orderDt;
+
+    @Column(nullable = false)
     private String status;
 
     @UpdateTimestamp
@@ -40,12 +51,13 @@ public class OrderJpaEntity {
 
 
     public Order toDomain() {
-        //List<OrderLine> lines = orderLines.stream().map(OrderLineJpaEntity::toDomain).toList();
+        List<OrderLine> lines = orderLines.stream().map(OrderLineJpaEntity::toDomain).toList();
         return Order.builder()
                 .orderId(orderId)
+                .orderCode(orderCode)
                 .userId(userId)
                 .totalPrice(totalPrice)
-                //.orderLines(lines)
+                .orderLines(lines)
                 .orderDt(orderDt)
                 .status(status)
                 .updateDt(updateDt)
@@ -55,6 +67,7 @@ public class OrderJpaEntity {
     public static OrderJpaEntity fromDomain(Order order) {
         OrderJpaEntity entity = new OrderJpaEntity();
         entity.orderId = order.getOrderId();
+        entity.orderCode = order.getOrderCode();
         entity.totalPrice = order.getTotalPrice();
         entity.userId = order.getUserId();
         entity.orderLines = order.getOrderLines().stream()

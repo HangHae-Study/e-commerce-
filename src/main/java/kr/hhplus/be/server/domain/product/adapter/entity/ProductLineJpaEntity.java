@@ -5,6 +5,7 @@ import kr.hhplus.be.server.domain.product.application.ProductLine;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -20,25 +21,33 @@ public class ProductLineJpaEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productLineId;
 
-    @Column(name = "product_id", nullable = false)
+    @Column(nullable = false)
     private Long productId;
 
-    private String productName;
+    @Column(length = 100, nullable = false)
+    private String productLineName;
 
     @Column(precision = 12, scale = 2)
     private BigDecimal productLinePrice;
 
+    @Column(nullable = false)
     private String productLineType;
 
     private Long remaining;
 
+    @UpdateTimestamp
+    @Column(
+            name = "update_dt",
+            nullable = false,
+            columnDefinition = "DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+    )
     private LocalDateTime updateDt;
 
     public ProductLine toDomain() {
         return ProductLine.builder()
                 .productLineId(productLineId)
                 .productId(productId)
-                .productName(productName)
+                .productLineName(productLineName)
                 .productLinePrice(productLinePrice)
                 .productLineType(productLineType)
                 .remaining(remaining)
@@ -49,7 +58,7 @@ public class ProductLineJpaEntity {
     public static ProductLineJpaEntity fromDomain(ProductLine line) {
         ProductLineJpaEntity entity = new ProductLineJpaEntity();
         entity.productId = line.getProductId();
-        entity.productName = line.getProductName();
+        entity.productLineName = line.getProductLineName();
         entity.productLinePrice = line.getProductLinePrice();
         entity.productLineType = line.getProductLineType();
         entity.remaining = line.getRemaining();

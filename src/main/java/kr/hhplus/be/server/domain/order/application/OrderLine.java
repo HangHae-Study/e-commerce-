@@ -1,8 +1,7 @@
 package kr.hhplus.be.server.domain.order.application;
 
-import kr.hhplus.be.server.domain.coupon.application.Coupon;
 import kr.hhplus.be.server.domain.coupon.application.CouponIssue;
-import kr.hhplus.be.server.domain.order.application.dto.OrderCreateRequest;
+import kr.hhplus.be.server.domain.order.controller.dto.OrderCreateRequest;
 import lombok.Builder;
 import lombok.Data;
 
@@ -14,14 +13,14 @@ import java.time.LocalDateTime;
 @Builder
 public class OrderLine {
     private Long orderLineId;
-    private String orderId;
+    private final Long orderId;
 
-    private Long userId;
-    private Long productId;
-    private Long productLineId;
+    private final Long userId;
+    private final Long productId;
+    private final Long productLineId;
 
-    private BigDecimal orderLinePrice;
-    private int quantity;
+    private final BigDecimal orderLinePrice;
+    private final int quantity;
 
     private String couponYn;
     private String couponCode;
@@ -31,15 +30,22 @@ public class OrderLine {
     private LocalDateTime orderDt;
     private LocalDateTime updateDt;
 
+    public void complete() {
+        if (!"O_MAKE".equals(status)) throw new IllegalStateException("주문 완료할 수 없는 상태입니다.");
+
+        setStatus("O_CMPL");
+        setUpdateDt(LocalDateTime.now());
+    }
+
     public BigDecimal getSubtotal() {
         return orderLinePrice.multiply(new BigDecimal(quantity));
     }
 
-    public void applyCoupon(CouponIssue coupon){
+    public void applyCoupon(BigDecimal discountRate){
         this.couponYn = "Y";
-        this.couponCode = coupon.getCouponCode();
 
-        BigDecimal rateFraction = coupon.getDiscountRate().movePointLeft(2); // 0.2
+        // 할인율을 0.2로 변환
+        BigDecimal rateFraction = discountRate.movePointLeft(2);
         BigDecimal multiplier   = BigDecimal.ONE.subtract(rateFraction);
 
         this.discountPrice = orderLinePrice
@@ -47,30 +53,5 @@ public class OrderLine {
                 .setScale(0, RoundingMode.HALF_UP);
     }
 
-    public static OrderLine create(OrderCreateRequest oReq, OrderCreateRequest.OrderItem olReq){
-        OrderLine ord = OrderLine.builder()
-                .orderId(oReq.orderId())
-                .userId(oReq.userId())
-                .productLineId(olReq.productLineId())
-                .orderLinePrice(olReq.linePrice())
-                .quantity(olReq.quantity())
-                .orderDt(LocalDateTime.now())
-                .status("O_MAKE")
-                .updateDt(LocalDateTime.now())
-                .build();
-
-        if(oReq.couponCode().isBlank() || oReq.couponCode().isEmpty()){
-
-        }else{
-            ord.couponYn = "Y";
-            ord.couponCode = oReq.couponCode();
-        }
-
-        return ord;
-    }
-
-    public void complete() {
-        setStatus("O_CMPL");
-    }
 }
 

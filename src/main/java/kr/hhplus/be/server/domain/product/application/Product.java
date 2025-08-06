@@ -5,12 +5,15 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
 public class Product {
-    private final Long productId;
-    private final String productName;
-    private final BigDecimal productPrice;
-    private final LocalDateTime updateDt;
+    private Long productId;
+    private String productName;
+    private List<ProductLine> productLines;
+    private BigDecimal productPrice;
+    private LocalDateTime updateDt;
+
 }

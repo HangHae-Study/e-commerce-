@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.coupon.application;
 
+import kr.hhplus.be.server.domain.coupon.application.generator.CouponCodeGenerator;
 import lombok.Builder;
 import lombok.Data;
 
@@ -22,7 +23,20 @@ public class Coupon {
     }
 
     public void decrease(){
+        if(this.remaining == 0){
+            throw new IllegalStateException("쿠폰 발급에 실패하였습니다.");
+        }
+
         this.remaining --;
+    }
+
+    public CouponIssue issueTo(Long userId, CouponCodeGenerator codeGen) {
+        if (!hasRemaining()) {
+            throw new IllegalStateException("쿠폰 발급에 실패하였습니다.");
+        }
+        String code = codeGen.generate(this, userId, remaining);
+        decrease();
+        return CouponIssue.issueNew(this, userId, code);
     }
 
 }

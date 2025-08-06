@@ -6,6 +6,7 @@ import kr.hhplus.be.server.domain.coupon.application.repository.CouponRepository
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,13 +23,21 @@ public class CouponJpaRepositoryAdapter implements CouponRepository {
 
     @Override
     public List<Coupon> findAll() {
-        return null;
+        return couponJpaRepository.findAll().stream().map(CouponJpaEntity::toDomain).toList();
+    }
+
+    @Override
+    public List<Coupon> findValidCouponList(LocalDateTime time, Long rem){
+        return couponJpaRepository.findCouponJpaEntitiesByExpireDateIsGreaterThanEqualAndRemainingIsGreaterThan(
+                time, rem).stream().map(
+                        CouponJpaEntity::toDomain
+        ).toList();
     }
 
     @Override
     public Coupon save(Coupon coupon) {
-        couponJpaRepository.save(CouponJpaEntity.fromDomain(coupon));
-        return null;
+        CouponJpaEntity saved = couponJpaRepository.save(CouponJpaEntity.fromDomain(coupon));
+        return saved.toDomain();
     }
 
     @Override

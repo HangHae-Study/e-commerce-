@@ -1,13 +1,11 @@
 package kr.hhplus.be.server.domain.product.controller;
 
 import kr.hhplus.be.server.common.api.ApiResponse;
-import kr.hhplus.be.server.domain.product.application.facade.ProductDetailFacade;
-import kr.hhplus.be.server.domain.product.controller.apidto.*;
+import kr.hhplus.be.server.domain.product.application.facade.ProductFacade;
+import kr.hhplus.be.server.domain.product.controller.dto.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -16,16 +14,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductController {
 
-    private final ProductDetailFacade productDetailFacade;
+    private final ProductFacade productFacade;
 
     @GetMapping
     public ResponseEntity<ApiResponse<ProductListResponse>> listProducts() {
-        return ResponseEntity.ok(ApiResponse.success(productDetailFacade.getAllProducts()));
+        return ResponseEntity.ok(ApiResponse.success(productFacade.getAllProducts()));
     }
 
     @GetMapping("/{productId}")
     public ResponseEntity<ApiResponse<ProductDetailResponse>> getProduct(@PathVariable Long productId) {
-        return ResponseEntity.ok(ApiResponse.success(productDetailFacade.getProductDetail(productId)));
+        return ResponseEntity.ok(ApiResponse.success(productFacade.getProductDetail(productId)));
     }
 
     @GetMapping("/top")

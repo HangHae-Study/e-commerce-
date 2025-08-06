@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.domain.order.application;
 
-import kr.hhplus.be.server.domain.order.application.dto.OrderCreateRequest;
+import jakarta.annotation.PostConstruct;
+import kr.hhplus.be.server.domain.order.controller.dto.OrderCreateRequest;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
@@ -12,31 +13,30 @@ import java.util.List;
 @Data
 @Builder(toBuilder = true)
 public class Order {
-    private String orderId;
-    private Long userId;
-    private BigDecimal totalPrice;
-    @Singular
-    private List<OrderLine> orderLines;
+    private final Long orderId;
+    private final String orderCode;
+    private final Long userId;
+    private final BigDecimal totalPrice;
+    private final List<OrderLine> orderLines;
     private LocalDateTime orderDt;
     private String status;
     private LocalDateTime updateDt;
 
-    public static Order create(OrderCreateRequest req){
-        List<OrderLine> ol = req.items().stream()
-                .map(a -> OrderLine.create(req, a)).toList();
-
-        return Order.builder()
-                .orderId(req.orderId())
-                .userId(req.userId())
-                .totalPrice(req.totalPrice())
-                .orderLines(ol)
-                .orderDt(LocalDateTime.now())
-                .status("O_MAKE")
-                .updateDt(LocalDateTime.now())
-                .build();
-    }
 
     public void complete() {
+        if (!"O_MAKE".equals(status)) throw new IllegalStateException("주문 완료할 수 없는 상태입니다.");
+
+        updateDt = LocalDateTime.now();
         setStatus("O_CMPL");
+    }
+
+    @PostConstruct
+    private void validate() {
+        if (orderLines.isEmpty()) throw new IllegalStateException("주문 항목이 비어있습니다.");
+        BigDecimal sum = orderLines.stream()
+                .map(OrderLine::getSubtotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        if (!sum.equals(totalPrice))
+            throw new IllegalStateException("총합이 일치하지 않습니다.");
     }
 }

@@ -28,8 +28,8 @@ public class ProductJpaRepositoryAdapter implements ProductRepository {
 
     @Override
     public Product save(Product product) {
-        productJpaRepository.save(ProductJpaEntity.fromDomain(product));
-        return product;
+        ProductJpaEntity p =  productJpaRepository.save(ProductJpaEntity.fromDomain(product));
+        return p.toDomain();
     }
 
     @Override

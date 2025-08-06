@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public record PaymentResponse(
         Long paymentId,
-        String orderId,
+        Long orderId,
         BigDecimal totalPrice,
         String paymentDt,
         String paymentStatus

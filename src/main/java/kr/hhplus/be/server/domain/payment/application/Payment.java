@@ -11,13 +11,13 @@ import java.time.LocalDateTime;
 public class Payment{
     private Long paymentId;
     private Long userId;
-    private String orderId;
+    private Long orderId;
     private BigDecimal totalPrice;
     private LocalDateTime paymentDt;
     private String status;
     private String updateDt;
 
-    public static Payment of(Long userId, String orderId, BigDecimal totalPrice, String status) {
+    public static Payment of(Long userId, Long orderId, BigDecimal totalPrice, String status) {
         return Payment.builder()
                 .userId(userId)
                 .orderId(orderId)
