@@ -74,7 +74,7 @@ tasks {
 		useJUnitPlatform()
 		systemProperty("user.timezone", "UTC")
 
-		systemProperty("testcontainers.disabled", "true")
+		//systemProperty("testcontainers.disabled", "true")
 	}
 
 	// 2) Asciidoctor → HTML 문서 생성
