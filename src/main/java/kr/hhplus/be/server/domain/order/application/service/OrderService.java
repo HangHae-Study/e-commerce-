@@ -40,8 +40,6 @@ public class OrderService {
         return order;
     }
 
-
-
     @Transactional
     public void orderComplete(Order order) {
         order.complete();

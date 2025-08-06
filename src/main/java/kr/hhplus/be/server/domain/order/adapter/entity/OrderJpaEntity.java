@@ -49,10 +49,15 @@ public class OrderJpaEntity {
     )
     private LocalDateTime updateDt;
 
+    @Version
+    @Column(nullable = false, columnDefinition = "BIGINT NOT NULL DEFAULT 0")
+    private Long version;
+
 
     public Order toDomain() {
         List<OrderLine> lines = orderLines.stream().map(OrderLineJpaEntity::toDomain).toList();
         return Order.builder()
+                .version(version)
                 .orderId(orderId)
                 .orderCode(orderCode)
                 .userId(userId)
@@ -75,6 +80,7 @@ public class OrderJpaEntity {
                 .toList();
         entity.orderDt = LocalDateTime.now();
         entity.status = order.getStatus();
+        entity.version = order.getVersion();
         return entity;
     }
 }

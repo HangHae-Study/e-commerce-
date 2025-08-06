@@ -1,17 +1,19 @@
 package kr.hhplus.be.server.domain.order.application;
 
+import kr.hhplus.be.server.common.optimistic.VersionedDomain;
 import kr.hhplus.be.server.domain.coupon.application.CouponIssue;
 import kr.hhplus.be.server.domain.order.controller.dto.OrderCreateRequest;
 import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 
 @Data
-@Builder
-public class OrderLine {
+@SuperBuilder
+public class OrderLine extends VersionedDomain {
     private Long orderLineId;
     private final Long orderId;
 

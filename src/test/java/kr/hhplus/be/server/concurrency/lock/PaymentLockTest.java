@@ -3,8 +3,10 @@ package kr.hhplus.be.server.concurrency.lock;
 
 import kr.hhplus.be.server.TestcontainersConfiguration;
 import kr.hhplus.be.server.domain.order.application.service.OrderService;
+import kr.hhplus.be.server.domain.payment.application.Payment;
 import kr.hhplus.be.server.domain.payment.application.dto.PaymentRequest;
 import kr.hhplus.be.server.domain.payment.application.facade.PaymentFacade;
+import kr.hhplus.be.server.domain.payment.application.repository.PaymentRepository;
 import kr.hhplus.be.server.domain.payment.application.service.PaymentService;
 import kr.hhplus.be.server.domain.product.application.ProductLine;
 import kr.hhplus.be.server.domain.product.application.service.ProductLineService;
@@ -39,7 +41,6 @@ public class PaymentLockTest {
     @SpringBootTest
     @Nested
     @DisplayName("결제 중 락 확인 테스트")
-    @Sql("classpath:sql/lock/Stock_Concurrency.sql")
     class PaymentLock {
 
         @Autowired
@@ -48,8 +49,12 @@ public class PaymentLockTest {
         @Autowired
         private ProductLineService productLineService;
 
+        @Autowired
+        private PaymentRepository paymentRepository;
+
         @Test
-        void 락을_이용한_결제_프로세스_실행() {
+        @Sql("classpath:sql/lock/StockConcurrency.sql")
+        void 비관적_락을_이용한_결제_프로세스_실행_재고확인() {
             int userCount = 100;
             ExecutorService executor = Executors.newFixedThreadPool(20);
 
@@ -61,6 +66,7 @@ public class PaymentLockTest {
                                     paymentFacade.process(new PaymentRequest("ORD-" + i));
                                     return true;
                                 } catch (Exception ex) {
+                                    System.out.println(ex.toString());
                                     return false;
                                 }
                             }, executor))
@@ -90,5 +96,54 @@ public class PaymentLockTest {
             assertThat(successCount).isEqualTo(100);
             assertThat(remainingTotal).isEqualTo(0);
         }
+
+        @Test
+        @Sql("classpath:sql/lock/OrderConcurrency.sql")
+        void 낙관적_락을_이용한_결제_프로세스_실행_주문상태확인(){
+            String orderCode = "ORD-1";
+            PaymentRequest req = new PaymentRequest(orderCode);
+
+            ExecutorService executor = Executors.newFixedThreadPool(2);
+
+            // 둘 다 거의 동시에 실행하여, 하나만 성공하길 기대
+            CompletableFuture<Boolean> f1 = CompletableFuture.supplyAsync(() -> {
+                try {
+                    paymentFacade.process(req);
+                    return true;
+                } catch (Exception ex) {
+                    return false;
+                }
+            }, executor);
+
+            CompletableFuture<Boolean> f2 = CompletableFuture.supplyAsync(() -> {
+                try {
+                    paymentFacade.process(req);
+                    return true;
+                } catch (Exception ex) {
+                    return false;
+                }
+            }, executor);
+
+            // 두 작업이 끝날 때까지 대기
+            CompletableFuture.allOf(f1, f2).join();
+            executor.shutdown();
+
+            // 결과 집계
+            List<Boolean> results = List.of(f1.join(), f2.join());
+            long successCount = results.stream().filter(b -> b).count();
+            long failureCount = results.stream().filter(b -> !b).count();
+
+            // 정확히 하나만 성공, 하나는 실패
+            assertThat(successCount).isEqualTo(1);
+            assertThat(failureCount).isEqualTo(1);
+
+            // 결제 레코드는 하나만 생성됐는지 확인
+            List<Payment> allPayments = paymentRepository.findAll();
+            assertThat(allPayments).hasSize(1);
+            assertThat(allPayments.get(0).getOrderId())
+                    .isEqualTo(allPayments.get(0).getOrderId());
+        }
     }
+
+
 }
