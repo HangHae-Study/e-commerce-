@@ -1,0 +1,12 @@
+package kr.hhplus.be.server.domain.product.controller.apidto;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+public record ProductDetailResponse(
+        Long productId,
+        String name,
+        String description,
+        BigDecimal price,
+        List<ProductLineItem> lines
+) {}

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -44,6 +45,20 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.joining("; "));
         ApiResponse<Void> body = new ApiResponse<>("INVALID_REQUEST", errors, null);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<ApiResponse<Void>> handleNoSuchElement(NoSuchElementException ex) {
+        String errors = ex.getMessage();
+        ApiResponse<Void> body = new ApiResponse<>("NOT_FOUND", errors, null);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiResponse<Void>> handleNoSuchElement(IllegalStateException ex) {
+        String errors = ex.getMessage();
+        ApiResponse<Void> body = new ApiResponse<>("CONFLICT", errors, null);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
 }

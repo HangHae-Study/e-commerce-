@@ -1,4 +1,4 @@
-package kr.hhplus.be.server;
+package kr.hhplus.be.server.doc;
 
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
@@ -9,17 +9,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.Schema;
-import kr.hhplus.be.server.domain.coupon.CouponController;
-import kr.hhplus.be.server.domain.order.OrderController;
-import kr.hhplus.be.server.domain.payment.PaymentController;
-import kr.hhplus.be.server.domain.product.ProductController;
-import kr.hhplus.be.server.domain.user.BalanceController;
+import kr.hhplus.be.server.domain.coupon.controller.CouponController;
+import kr.hhplus.be.server.domain.order.controller.OrderController;
+import kr.hhplus.be.server.domain.payment.controller.PaymentController;
+import kr.hhplus.be.server.domain.product.controller.ProductController;
+import kr.hhplus.be.server.domain.user.controller.PointController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -34,7 +33,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.pathPara
 
 
 @WebMvcTest({
-        BalanceController.class,
+        PointController.class,
         ProductController.class,
         OrderController.class,
         PaymentController.class,
