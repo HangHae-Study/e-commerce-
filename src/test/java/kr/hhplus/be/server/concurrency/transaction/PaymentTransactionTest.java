@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.transaction;
+package kr.hhplus.be.server.concurrency.transaction;
 
 
 import kr.hhplus.be.server.TestcontainersConfiguration;
@@ -13,6 +13,7 @@ import kr.hhplus.be.server.domain.user.application.Users;
 import kr.hhplus.be.server.domain.user.application.dto.PointDao;
 import kr.hhplus.be.server.domain.user.application.repository.PointRepository;
 import kr.hhplus.be.server.domain.user.application.service.UserService;
+import kr.hhplus.be.server.domain.user.exception.InsufficientBalanceException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -94,14 +95,14 @@ public class PaymentTransactionTest {
 
         @Test
         // Transaction이 각 서비스 단위에서 있을 때
-        void 결제_중_예외발생시_롤백_로직_하위클래스_책임(){
+        void 결제_중_예외발생시_롤백_로직_트랜잭션_책임(){
             // 유저 1 결제 실패
             PaymentRequest req = new PaymentRequest("ORD-1-FAIL");
             Optional<PointDao> beforePoint = pointRepository.findByUserId(1L);
             List<ProductLine> beforeLines = productLineRepository.findByProductId(1L);
 
-            //assertThatThrownBy(() -> paymentFacade.process(req))
-            //        .isInstanceOf(OutOfStockException.class);
+            assertThatThrownBy(() -> paymentFacade.process(req))
+                    .isInstanceOf(IllegalStateException.class);
 
             // 포인트 및 재고 변화 없음
             Optional<PointDao> afterPoint = pointRepository.findByUserId(1L);
@@ -134,6 +135,39 @@ public class PaymentTransactionTest {
             }
         }
 
+    }
+
+    @SpringBootTest
+    @Nested
+    @DisplayName("잔고 관련 트랜잭션 확인 테스트")
+    @Sql("classpath:sql/transaction/point/InsufficientBalance.sql")
+    class PointTransaction{
+        @Autowired private PaymentFacade paymentFacade;
+        @Autowired private PointRepository pointRepository;
+        @Autowired private ProductLineRepository productLineRepository;
+
+        @Test
+        void 결제_중_예외발생시_포인트_유지_트랜잭션_검증(){
+            // 유저 1 결제 실패
+            PaymentRequest req = new PaymentRequest("ORD-1-FAIL");
+            Optional<PointDao> beforePoint = pointRepository.findByUserId(1L);
+            List<ProductLine> beforeLines = productLineRepository.findByProductId(1L);
+
+            assertThatThrownBy(() -> paymentFacade.process(req))
+                    .isInstanceOf(IllegalStateException.class);
+
+            // 포인트 및 재고 변화 없음
+            Optional<PointDao> afterPoint = pointRepository.findByUserId(1L);
+            assertThat(beforePoint.get().getBalance()).isEqualByComparingTo(afterPoint.get().getBalance());
+
+            // 재고 변화 없음
+            List<ProductLine> afterLines = productLineRepository.findByProductId(1L);
+            for (int i = 0; i<beforeLines.size(); i++){
+                assertThat(beforeLines.get(i).getRemaining()).isEqualTo(
+                        afterLines.get(i).getRemaining()
+                );
+            }
+        }
     }
 
 

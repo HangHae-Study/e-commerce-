@@ -20,6 +20,11 @@ public class ProductLineJpaRepositoryAdapter implements ProductLineRepository {
     }
 
     @Override
+    public Optional<ProductLine> findByIdWithPessimisticLock(Long plId){
+        return productLineJpaRepository.findByIdForUpdate(plId).map(ProductLineJpaEntity::toDomain);
+    }
+
+    @Override
     public List<ProductLine> findAll() {
         return null;
     }

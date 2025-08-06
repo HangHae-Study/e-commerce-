@@ -1,6 +1,5 @@
 package kr.hhplus.be.server.domain.product.application.service;
 
-import kr.hhplus.be.server.domain.product.application.Product;
 import kr.hhplus.be.server.domain.product.application.ProductLine;
 import kr.hhplus.be.server.domain.product.application.repository.ProductLineRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,14 +19,16 @@ public class ProductLineService {
     }
 
     public ProductLine getProductLine(Long productId){
-        return productLineRepository.findById(productId)
+        // Step 09 : 비관적 락으로 수정
+        return productLineRepository.findByIdWithPessimisticLock(productId)
+                //productLineRepository.findById(productId)
                 .orElseThrow(() -> new NoSuchElementException("올바르지 않은 상품입니다"));
     }
 
 
-    @Transactional
-    public ProductLine updateProductLine(ProductLine product){
-        return productLineRepository.save(product);
+    //@Transactional
+    public void updateProductLine(ProductLine product){
+        productLineRepository.save(product);
     }
 
 }

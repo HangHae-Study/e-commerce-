@@ -20,11 +20,13 @@ public class InventoryFacade {
 
 
     /** 주문 건 전체 재고가 충분한지 확인 (부족하면 예외) */
+    @Transactional
     public void checkStock(Order order) {
         List<OrderLine> succeededStockLines = new ArrayList<>();
         try{
             order.getOrderLines().forEach(line -> {
                 ProductLine pl = productLineService.getProductLine(line.getProductLineId());
+
                 pl.decreaseStock((long) line.getQuantity());  // domain 메서드 안에서 부족하면 OutOfStockeException
                 productLineService.updateProductLine(pl);
 

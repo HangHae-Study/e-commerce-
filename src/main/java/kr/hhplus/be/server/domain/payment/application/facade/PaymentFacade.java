@@ -57,11 +57,11 @@ public class PaymentFacade {
             );
         }catch(RestoreOutOfStockException restEx){
             // 복구 로직 - 5개중 4개만 업데이트 되었다면, 4개만 되돌리기?
-            inventoryFacade.restoreStock(restEx.getSucceededLines(), 0);
+            //inventoryFacade.restoreStock(restEx.getSucceededLines(), 0);
             throw new IllegalStateException("재고가 부족하여 결제에 실패하였습니다.");
         }catch (InsufficientBalanceException ex){
             // 복구 로직
-            inventoryFacade.restoreStock(order.getOrderLines(), 0);
+            //inventoryFacade.restoreStock(order.getOrderLines(), 0);
             throw new IllegalStateException("잔고가 부족하여 결제에 실패하였습니다.");
         }
     }
