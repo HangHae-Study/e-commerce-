@@ -1,5 +1,12 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
+TRUNCATE users;
+TRUNCATE points;
+TRUNCATE product;
+TRUNCATE product_line;
+TRUNCATE orders;
+TRUNCATE order_lines;
+
 INSERT INTO users (user_id, username) VALUES
                                           (1, 'user1'),
                                           (2, 'user2');

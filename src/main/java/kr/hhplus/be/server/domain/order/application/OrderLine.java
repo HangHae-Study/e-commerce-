@@ -39,6 +39,13 @@ public class OrderLine extends VersionedDomain {
         setUpdateDt(LocalDateTime.now());
     }
 
+    public void fail() {
+        if (!"O_MAKE".equals(status)) throw new IllegalStateException("주문 이미 처리된 상태입니다.");
+
+        setStatus("O_FAIL");
+        setUpdateDt(LocalDateTime.now());
+    }
+
     public BigDecimal getSubtotal() {
         return orderLinePrice.multiply(new BigDecimal(quantity));
     }

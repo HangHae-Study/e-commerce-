@@ -18,7 +18,8 @@ public class OrderJpaRepositoryAdapter implements OrderRepository {
 
     @Override
     public Optional<Order> findById(Long orderId) {
-        return jpaRepository.findById(orderId)
+        return jpaRepository.findByIdWithLock(orderId)
+                //.findById(orderId)
                 .map(OrderJpaEntity::toDomain);
     }
 

@@ -17,7 +17,6 @@ import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderLineRepository orderLineRepository;
@@ -28,23 +27,36 @@ public class OrderService {
         return newOrder;
     }
 
+    @Transactional
     public Order getOrder(Long orderId){
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new NoSuchElementException("올바르지 않은 주문 입니다"));
         return order;
     }
 
+    @Transactional
     public Order getOrderByCode(String orderCode){
         Order order = orderRepository.findByOrderCode(orderCode)
                 .orElseThrow(() -> new NoSuchElementException("올바르지 않은 주문 입니다"));
         return order;
     }
 
+
     @Transactional
     public void orderComplete(Order order) {
         order.complete();
         for (OrderLine orderLine : order.getOrderLines()) {
             orderLine.complete();
+        }
+
+        orderRepository.save(order);
+    }
+
+    @Transactional
+    public void orderFailed(Order order) {
+        order.fail();
+        for (OrderLine orderLine : order.getOrderLines()) {
+            orderLine.fail();
         }
 
         orderRepository.save(order);

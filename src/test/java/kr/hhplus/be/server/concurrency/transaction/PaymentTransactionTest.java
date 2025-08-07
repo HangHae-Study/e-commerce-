@@ -52,7 +52,7 @@ public class PaymentTransactionTest {
         @Autowired private ProductLineRepository productLineRepository;
 
         @Test
-        // Transaction이 PaymentFacade 단위에서 있을 때
+        // Transaction이 PaymentFacade 단위 -> 하위 계층 서비스 단위로 변경
         void 결제_중_예외발생시_재고량_유지_트랜잭션_검증(){
             // 유저 1 결제 실패
             PaymentRequest req = new PaymentRequest("ORD-1-FAIL");
@@ -60,7 +60,7 @@ public class PaymentTransactionTest {
             List<ProductLine> beforeLines = productLineRepository.findByProductId(1L);
 
             assertThatThrownBy(() -> paymentFacade.process(req))
-                    .isInstanceOf(OutOfStockException.class);
+                .isInstanceOf(IllegalStateException.class);
 
             // 포인트 및 재고 변화 없음
             Optional<PointDao> afterPoint = pointRepository.findByUserId(1L);
@@ -80,53 +80,11 @@ public class PaymentTransactionTest {
 
             paymentFacade.process(req2);
 
-            // 포인트 및 재고 변화 없음
+            // 포인트 및 재고 변화 있음
             Optional<PointDao> afterPoint2 = pointRepository.findByUserId(2L);
             assertThat(beforePoint2.get().getBalance()).isNotEqualByComparingTo(afterPoint2.get().getBalance());
 
-            // 재고 변화 없음
-            List<ProductLine> afterLines2 = productLineRepository.findByProductId(1L);
-            for (int i = 0; i<beforeLines.size(); i++){
-                assertThat(beforeLines.get(i).getRemaining()).isNotEqualTo(
-                        afterLines2.get(i).getRemaining()
-                );
-            }
-        }
-
-        @Test
-        // Transaction이 각 서비스 단위에서 있을 때
-        void 결제_중_예외발생시_롤백_로직_트랜잭션_책임(){
-            // 유저 1 결제 실패
-            PaymentRequest req = new PaymentRequest("ORD-1-FAIL");
-            Optional<PointDao> beforePoint = pointRepository.findByUserId(1L);
-            List<ProductLine> beforeLines = productLineRepository.findByProductId(1L);
-
-            assertThatThrownBy(() -> paymentFacade.process(req))
-                    .isInstanceOf(IllegalStateException.class);
-
-            // 포인트 및 재고 변화 없음
-            Optional<PointDao> afterPoint = pointRepository.findByUserId(1L);
-            assertThat(beforePoint.get().getBalance()).isEqualByComparingTo(afterPoint.get().getBalance());
-
-            // 재고 변화 없음
-            List<ProductLine> afterLines = productLineRepository.findByProductId(1L);
-            for (int i = 0; i<beforeLines.size(); i++){
-                assertThat(beforeLines.get(i).getRemaining()).isEqualTo(
-                        afterLines.get(i).getRemaining()
-                );
-            }
-
-            // 유저 2 결제 성공
-            PaymentRequest req2 = new PaymentRequest("ORD-2-SUCC");
-            Optional<PointDao> beforePoint2 = pointRepository.findByUserId(2L);
-
-            paymentFacade.process(req2);
-
-            // 포인트 및 재고 변화 없음
-            Optional<PointDao> afterPoint2 = pointRepository.findByUserId(2L);
-            assertThat(beforePoint2.get().getBalance()).isNotEqualByComparingTo(afterPoint2.get().getBalance());
-
-            // 재고 변화 없음
+            // 재고 변화 있음
             List<ProductLine> afterLines2 = productLineRepository.findByProductId(1L);
             for (int i = 0; i<beforeLines.size(); i++){
                 assertThat(beforeLines.get(i).getRemaining()).isNotEqualTo(

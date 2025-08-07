@@ -32,6 +32,13 @@ public class Order extends VersionedDomain {
         setStatus("O_CMPL");
     }
 
+    public void fail() {
+        if (!"O_MAKE".equals(status)) throw new IllegalStateException("주문 이미 처리된 상태입니다.");
+
+        updateDt = LocalDateTime.now();
+        setStatus("O_FAIL");
+    }
+
     @PostConstruct
     private void validate() {
         if (orderLines.isEmpty()) throw new IllegalStateException("주문 항목이 비어있습니다.");

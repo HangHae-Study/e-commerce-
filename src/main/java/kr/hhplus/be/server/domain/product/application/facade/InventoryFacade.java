@@ -38,6 +38,7 @@ public class InventoryFacade {
         }
     }
 
+    @Transactional
     public void restoreStock(List<OrderLine> lines, int var) {
         lines.forEach(line -> {
             ProductLine pl = productLineService.getProductLine(line.getProductLineId());
@@ -46,7 +47,7 @@ public class InventoryFacade {
         });
     }
 
-    /** 체크 후 실패했을 때 롤백용 원복 */
+    @Transactional
     public void restoreStock(Order order) {
         order.getOrderLines().forEach(line -> {
             ProductLine pl = productLineService.getProductLine(line.getProductLineId());
