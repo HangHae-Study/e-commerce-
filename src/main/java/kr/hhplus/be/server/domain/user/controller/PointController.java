@@ -3,6 +3,7 @@ package kr.hhplus.be.server.domain.user.controller;
 import jakarta.validation.Valid;
 import kr.hhplus.be.server.common.api.ApiResponse;
 import kr.hhplus.be.server.domain.user.application.Users;
+import kr.hhplus.be.server.domain.user.application.dto.PointDao;
 import kr.hhplus.be.server.domain.user.application.service.UserService;
 import kr.hhplus.be.server.domain.user.controller.dto.BalanceChargeRequest;
 import kr.hhplus.be.server.domain.user.controller.dto.BalanceChargeResponse;
@@ -23,9 +24,9 @@ public class PointController {
     @GetMapping("/{userId}")
     public ResponseEntity<ApiResponse<BalanceInquiryResponse>> getBalance(@PathVariable Long userId) {
 
-        BigDecimal point = userService.getPoint(userId);
+        PointDao point = userService.getPoint(userId);
 
-        BalanceInquiryResponse data = new BalanceInquiryResponse(userId, point);
+        BalanceInquiryResponse data = new BalanceInquiryResponse(userId, point.getBalance());
 
         return ResponseEntity.ok(ApiResponse.success(data));
     }

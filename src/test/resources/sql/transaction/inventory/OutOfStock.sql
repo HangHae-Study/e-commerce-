@@ -1,5 +1,12 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
+TRUNCATE users;
+TRUNCATE points;
+TRUNCATE product;
+TRUNCATE product_line;
+TRUNCATE orders;
+TRUNCATE order_lines;
+
 INSERT INTO users (user_id, username) VALUES
                                           (1, 'user1'),
                                           (2, 'user2');
@@ -15,32 +22,32 @@ INSERT INTO product (product_id, product_name, product_price) VALUES
 INSERT INTO product_line (
     product_line_id, product_id, product_line_name, product_line_price, product_line_type, remaining
 ) VALUES
-      (1, 1, 'Line-1', 10.00, 'TYPE', 1),
-      (2, 1, 'Line-2', 20.00, 'TYPE', 1),
-      (3, 1, 'Line-3', 30.00, 'TYPE', 2);
+      (1, 1, 'Line-1', 10.00, 'TYPE', 2),
+      (2, 1, 'Line-2', 20.00, 'TYPE', 2),
+      (3, 1, 'Line-3', 30.00, 'TYPE', 1);
 
 -- 3) User1 주문 시도 (각 2개) — 재고 부족으로 비즈니스 로직에서 실패
-INSERT INTO orders (order_id, order_code, user_id, total_price, order_dt, status) VALUES
-    (1001, 'ORD-1-FAIL', 1, (2*10.00 + 2*20.00 + 2*30.00), '2025-08-01 09:00:00', 'O_MAKE');
+INSERT INTO orders (order_id, order_code, user_id, total_price, order_dt, status, version) VALUES
+    (1001, 'ORD-1-FAIL', 1, (2*10.00 + 2*20.00 + 2*30.00), '2025-08-01 09:00:00', 'O_MAKE', 0);
 
 INSERT INTO order_lines (
     order_line_id, order_id, user_id, product_line_id,
-    order_line_price, quantity, status, order_dt
+    order_line_price, quantity, status, order_dt, version
 ) VALUES
-      (2001, 1001, 1, 1, 10.00, 2, 'O_MAKE', '2025-08-01 09:00:00'),
-      (2002, 1001, 1, 2, 20.00, 2, 'O_MAKE', '2025-08-01 09:00:00'),
-      (2003, 1001, 1, 3, 30.00, 2, 'O_MAKE', '2025-08-01 09:00:00');
+      (2001, 1001, 1, 1, 10.00, 2, 'O_MAKE', '2025-08-01 09:00:00', 0),
+      (2002, 1001, 1, 2, 20.00, 2, 'O_MAKE', '2025-08-01 09:00:00', 0),
+      (2003, 1001, 1, 3, 30.00, 2, 'O_MAKE', '2025-08-01 09:00:00', 0);
 
 -- 4) User2 주문 (각 1개) — 재고 충분으로 성공
-INSERT INTO orders (order_id, order_code, user_id, total_price, order_dt, status) VALUES
-    (1002, 'ORD-2-SUCC', 2, (1*10.00 + 1*20.00 + 1*30.00), '2025-08-01 10:00:00', 'O_CMPL');
+INSERT INTO orders (order_id, order_code, user_id, total_price, order_dt, status, version) VALUES
+    (1002, 'ORD-2-SUCC', 2, (1*10.00 + 1*20.00 + 1*30.00), '2025-08-01 10:00:00', 'O_MAKE', 0);
 
 INSERT INTO order_lines (
     order_line_id, order_id, user_id, product_line_id,
-    order_line_price, quantity, status, order_dt
+    order_line_price, quantity, status, order_dt, version
 ) VALUES
-      (2004, 1002, 2, 1, 10.00, 1, 'O_MAKE', '2025-08-01 10:00:00'),
-      (2005, 1002, 2, 2, 20.00, 1, 'O_MAKE', '2025-08-01 10:00:00'),
-      (2006, 1002, 2, 3, 30.00, 1, 'O_MAKE', '2025-08-01 10:00:00');
+      (2004, 1002, 2, 1, 10.00, 1, 'O_MAKE', '2025-08-01 10:00:00', 0),
+      (2005, 1002, 2, 2, 20.00, 1, 'O_MAKE', '2025-08-01 10:00:00', 0),
+      (2006, 1002, 2, 3, 30.00, 1, 'O_MAKE', '2025-08-01 10:00:00', 0);
 
 SET FOREIGN_KEY_CHECKS = 1;

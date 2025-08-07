@@ -18,7 +18,8 @@ public class OrderJpaRepositoryAdapter implements OrderRepository {
 
     @Override
     public Optional<Order> findById(Long orderId) {
-        return jpaRepository.findById(orderId)
+        return jpaRepository.findByIdWithLock(orderId)
+                //.findById(orderId)
                 .map(OrderJpaEntity::toDomain);
     }
 
@@ -43,6 +44,8 @@ public class OrderJpaRepositoryAdapter implements OrderRepository {
 
     @Override
     public Optional<Order> findByOrderCode(String code) {
-        return jpaRepository.findByOrderCode(code).map(OrderJpaEntity::toDomain);
+        //return jpaRepository.findByOrderCode(code).map(OrderJpaEntity::toDomain);
+        // step 09 : 낙관적 락으로 변경
+        return jpaRepository.findByOrderCodeWithLock(code).map(OrderJpaEntity::toDomain);
     }
 }

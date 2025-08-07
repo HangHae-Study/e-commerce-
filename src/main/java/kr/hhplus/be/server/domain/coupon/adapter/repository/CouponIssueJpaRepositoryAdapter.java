@@ -27,7 +27,10 @@ public class CouponIssueJpaRepositoryAdapter implements CouponIssueRepository {
 
     @Override
     public List<CouponIssue> findAll() {
-        return null;
+        return couponIssueJpaRepository.findAll()
+                .stream().map(
+                        CouponIssueJpaEntity::toDomain
+                ).toList();
     }
 
     @Override
@@ -44,7 +47,8 @@ public class CouponIssueJpaRepositoryAdapter implements CouponIssueRepository {
 
     @Override
     public Optional<CouponIssue> findByCouponCode(String code) {
-        return couponIssueJpaRepository.findCouponIssueJpaEntitiesByCouponCode(code).map(CouponIssueJpaEntity::toDomain);
+        return couponIssueJpaRepository.findByCouponCodeWithLock(code).map(CouponIssueJpaEntity::toDomain);
+        //couponIssueJpaRepository.findCouponIssueJpaEntitiesByCouponCode(code).map(CouponIssueJpaEntity::toDomain);
 
     }
 }

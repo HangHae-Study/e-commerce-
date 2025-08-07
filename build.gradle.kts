@@ -66,13 +66,16 @@ dependencies {
 }
 
 
-
 val snippetsDir by extra { file("build/generated-snippets") }
 tasks {
 	named<Test>("test") {
 		outputs.dir(snippetsDir)
 		useJUnitPlatform()
 		systemProperty("user.timezone", "UTC")
+
+		testLogging{
+			showStandardStreams = true
+		}
 
 		//systemProperty("testcontainers.disabled", "true")
 	}

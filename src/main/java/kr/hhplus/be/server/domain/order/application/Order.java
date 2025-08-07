@@ -1,18 +1,21 @@
 package kr.hhplus.be.server.domain.order.application;
 
 import jakarta.annotation.PostConstruct;
+import kr.hhplus.be.server.common.optimistic.VersionedDomain;
+import kr.hhplus.be.server.domain.order.application.exception.AlreadyProcessedOrderException;
 import kr.hhplus.be.server.domain.order.controller.dto.OrderCreateRequest;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@Builder(toBuilder = true)
-public class Order {
+@SuperBuilder
+public class Order extends VersionedDomain {
     private final Long orderId;
     private final String orderCode;
     private final Long userId;
@@ -24,10 +27,17 @@ public class Order {
 
 
     public void complete() {
-        if (!"O_MAKE".equals(status)) throw new IllegalStateException("주문 완료할 수 없는 상태입니다.");
+        if (!"O_MAKE".equals(status)) throw new AlreadyProcessedOrderException(orderId, orderCode);
 
         updateDt = LocalDateTime.now();
         setStatus("O_CMPL");
+    }
+
+    public void fail() {
+        if (!"O_MAKE".equals(status)) throw new AlreadyProcessedOrderException(orderId, orderCode);
+
+        updateDt = LocalDateTime.now();
+        setStatus("O_FAIL");
     }
 
     @PostConstruct

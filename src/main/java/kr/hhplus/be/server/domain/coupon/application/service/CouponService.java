@@ -2,6 +2,7 @@ package kr.hhplus.be.server.domain.coupon.application.service;
 
 import kr.hhplus.be.server.domain.coupon.application.Coupon;
 import kr.hhplus.be.server.domain.coupon.application.CouponIssue;
+import kr.hhplus.be.server.domain.coupon.application.exception.InvalidCouponException;
 import kr.hhplus.be.server.domain.coupon.application.generator.CouponCodeGenerator;
 import kr.hhplus.be.server.domain.coupon.application.repository.CouponIssueRepository;
 import kr.hhplus.be.server.domain.coupon.application.repository.CouponRepository;
@@ -34,7 +35,8 @@ public class CouponService {
 
     @Transactional
     public CouponIssue newCouponIssue(Long userId, Long couponId) {
-        Coupon coupon = couponRepository.findById(couponId)
+        Coupon coupon = couponRepository.findByIdWithPessimisticLock(couponId)
+                //couponRepository.findById(couponId)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 쿠폰입니다."));
 
         // 쿠폰이 스스로 발급 로직을 수행 → 남은 수량 감소, CouponIssue 생성
@@ -51,10 +53,10 @@ public class CouponService {
         }
 
         CouponIssue ci = couponIssueRepository.findByCouponCode(couponCode)
-                .orElseThrow(() -> new NoSuchElementException("발급(유효)되지 않은 쿠폰입니다."));
+                .orElseThrow(() -> new InvalidCouponException(couponCode));
 
         if(!Objects.equals(userId, ci.getUserId()) || !ci.isValid()){
-            throw new IllegalStateException("유효하지 않은 쿠폰 입니다");
+            throw new InvalidCouponException(couponCode);
         }
         return ci;
     }
@@ -71,5 +73,34 @@ public class CouponService {
 
         return ci;
     }
+
+    public CouponIssue getCouponIssueForRestore(Long userId, String couponCode){
+        if(couponCode.isEmpty() || couponCode.isBlank()){
+            return null;
+        }
+
+        CouponIssue ci = couponIssueRepository.findByCouponCode(couponCode)
+                .orElseThrow(() -> new InvalidCouponException(couponCode));
+
+        if(!Objects.equals(userId, ci.getUserId())){
+            throw new InvalidCouponException(couponCode);
+        }
+        return ci;
+    }
+
+    @Transactional
+    public CouponIssue couponRestoreByPayment(Long userId, String cCode){
+        if(cCode.isEmpty() || cCode.isBlank()){
+            return null;
+        }
+
+        CouponIssue ci = getCouponIssueForRestore(userId, cCode);
+        ci.setCouponValid("Y");
+
+        couponIssueRepository.save(ci);
+
+        return ci;
+    }
+
 
 }

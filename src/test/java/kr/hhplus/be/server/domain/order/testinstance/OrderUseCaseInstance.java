@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class OrderUseCaseInstance {
 
@@ -72,7 +73,7 @@ public class OrderUseCaseInstance {
                         .quantity(item.quantity())
                         .orderDt(LocalDateTime.now())
                         .build())
-                .toList();
+                .collect(Collectors.toList());
         return Order.builder()
                 .userId(userId)
                 .totalPrice(lines.stream()
@@ -91,7 +92,7 @@ public class OrderUseCaseInstance {
     }
 
     public Order orderSavedInFacade(Long orderId, Order ord){
-        return ord.toBuilder()
+        return Order.builder()
                 .orderId(orderId)
                 .status(ord.getStatus())
                 .build();

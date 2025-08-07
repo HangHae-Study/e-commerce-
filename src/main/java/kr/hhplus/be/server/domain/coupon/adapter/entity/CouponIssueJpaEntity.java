@@ -25,6 +25,13 @@ public class CouponIssueJpaEntity {
     private BigDecimal discountRate;
     private LocalDateTime expireDate;
 
+    @Version
+    @Column(
+            nullable = false,
+            columnDefinition = "BIGINT NOT NULL DEFAULT 0"
+    )
+    private Long version;
+
     @UpdateTimestamp
     @Column(
             name = "update_dt",
@@ -35,6 +42,7 @@ public class CouponIssueJpaEntity {
 
     public CouponIssue toDomain() {
         return CouponIssue.builder()
+                .version(version)
                 .couponIssueId(this.couponIssueId)
                 .couponCode(this.couponCode)
                 .couponId(this.couponId)
@@ -58,6 +66,7 @@ public class CouponIssueJpaEntity {
         e.discountRate  = issue.getDiscountRate();
         e.expireDate    = issue.getExpireDate();
         e.updateDt      = issue.getUpdateDt();
+        e.version       = issue.getVersion();
         return e;
     }
 }

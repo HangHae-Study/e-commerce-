@@ -18,6 +18,12 @@ public class CouponController {
     private final CouponService couponService;
     private final CouponIssueMapper couponIssueMapper;
 
+    @GetMapping
+    public ResponseEntity<ApiResponse<?>> listCoupon(){
+
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
     @PostMapping
     public ResponseEntity<ApiResponse<CouponIssueResponse>> issueCoupon(
             @RequestBody CouponIssueRequest req) {

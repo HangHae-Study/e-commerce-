@@ -74,6 +74,10 @@ public class OrderLineJpaEntity {
     )
     private LocalDateTime updateDt;
 
+    @Version
+    @Column(nullable = false, columnDefinition = "BIGINT NOT NULL DEFAULT 0")
+    private Long version;
+
 
     @PrePersist
     public void prePersist(){
@@ -84,6 +88,7 @@ public class OrderLineJpaEntity {
 
     public OrderLine toDomain() {
         return OrderLine.builder()
+                .version(version)
                 .orderLineId(orderLineId)
                 .orderId(order.getOrderId())
                 .userId(userId)
@@ -120,6 +125,8 @@ public class OrderLineJpaEntity {
         entity.status         = line.getStatus();
         entity.orderDt        = line.getOrderDt();
         entity.updateDt       = line.getUpdateDt();
+
+        entity.version = line.getVersion();
 
         return entity;
     }

@@ -1,15 +1,17 @@
 package kr.hhplus.be.server.domain.coupon.application;
 
+import kr.hhplus.be.server.common.optimistic.VersionedDomain;
 import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 
 @Data
-@Builder
-public class CouponIssue {
+@SuperBuilder
+public class CouponIssue extends VersionedDomain {
 
     private Long couponIssueId;
 
