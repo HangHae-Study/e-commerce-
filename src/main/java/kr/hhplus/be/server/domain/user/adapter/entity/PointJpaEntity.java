@@ -1,14 +1,19 @@
 package kr.hhplus.be.server.domain.user.adapter.entity;
 
 import jakarta.persistence.*;
+import kr.hhplus.be.server.domain.order.adapter.entity.OrderLineJpaEntity;
 import kr.hhplus.be.server.domain.user.application.Users;
 import kr.hhplus.be.server.domain.user.application.dto.PointDao;
+import kr.hhplus.be.server.domain.user.application.dto.PointRecordDao;
 import lombok.Getter;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Table(name="points")
 @Getter
@@ -22,6 +27,9 @@ public class PointJpaEntity {
     @Column(precision = 12, scale = 2, nullable = false)
     private BigDecimal balance;
 
+    @OneToMany(mappedBy = "point", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<PointRecordJpaEntity> pointRecords = new ArrayList<>();
+
     @UpdateTimestamp
     @Column(
             name = "update_dt",
@@ -31,11 +39,13 @@ public class PointJpaEntity {
     private LocalDateTime updateDt;
 
     public PointDao toDao() {
+        List<PointRecordDao> records = pointRecords.stream().map(PointRecordJpaEntity::toDao).collect(Collectors.toList());
         return PointDao.builder()
                 .pointId(pointId)
                 .userId(userId)
                 .balance(balance)
                 .updateDt(updateDt)
+                .pointRecords(records)
                 .build();
     }
 
@@ -47,6 +57,9 @@ public class PointJpaEntity {
         e.userId  = domain.getUserId();
         e.balance = domain.getBalance();
         e.updateDt = domain.getUpdateDt();
+        e.pointRecords = domain.getPointRecords().stream().map(
+                record -> PointRecordJpaEntity.fromDao(record, e)
+        ).toList();
         return e;
     }
 }

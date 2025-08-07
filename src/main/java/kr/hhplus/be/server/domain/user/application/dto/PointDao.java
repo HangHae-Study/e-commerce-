@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -13,4 +14,5 @@ public class PointDao {
     private Long userId;
     private BigDecimal balance;
     private LocalDateTime updateDt;
+    private List<PointRecordDao> pointRecords;
 }

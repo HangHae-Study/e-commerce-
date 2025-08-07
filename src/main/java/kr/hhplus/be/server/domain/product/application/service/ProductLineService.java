@@ -25,8 +25,6 @@ public class ProductLineService {
                 .orElseThrow(() -> new NoSuchElementException("올바르지 않은 상품입니다"));
     }
 
-
-    //@Transactional
     public void updateProductLine(ProductLine product){
         productLineRepository.save(product);
     }
