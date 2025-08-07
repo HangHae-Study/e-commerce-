@@ -2,6 +2,7 @@ package kr.hhplus.be.server.domain.order.application;
 
 import jakarta.annotation.PostConstruct;
 import kr.hhplus.be.server.common.optimistic.VersionedDomain;
+import kr.hhplus.be.server.domain.order.application.exception.AlreadyProcessedOrderException;
 import kr.hhplus.be.server.domain.order.controller.dto.OrderCreateRequest;
 import lombok.Builder;
 import lombok.Data;
@@ -26,14 +27,14 @@ public class Order extends VersionedDomain {
 
 
     public void complete() {
-        if (!"O_MAKE".equals(status)) throw new IllegalStateException("주문 완료할 수 없는 상태입니다.");
+        if (!"O_MAKE".equals(status)) throw new AlreadyProcessedOrderException(orderId, orderCode);
 
         updateDt = LocalDateTime.now();
         setStatus("O_CMPL");
     }
 
     public void fail() {
-        if (!"O_MAKE".equals(status)) throw new IllegalStateException("주문 이미 처리된 상태입니다.");
+        if (!"O_MAKE".equals(status)) throw new AlreadyProcessedOrderException(orderId, orderCode);
 
         updateDt = LocalDateTime.now();
         setStatus("O_FAIL");

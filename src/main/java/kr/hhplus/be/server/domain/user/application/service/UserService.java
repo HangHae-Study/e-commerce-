@@ -78,12 +78,11 @@ public class UserService {
             userRepository.save(user);
 
             point.setBalance(user.getBalance());
-            //point.getPointRecords().add(records);
             pointRepository.save(point);
             pointRecordRepository.save(records);
             return user;
         }catch(DataIntegrityViolationException ex){
-            throw new AlreadyProcessedPointException(point.getPointId(), "USE", reqId);
+            throw new AlreadyProcessedPointException(point.getPointId(), "CHARGE", reqId);
         }
     }
 
@@ -111,7 +110,6 @@ public class UserService {
             userRepository.save(user);
 
             point.setBalance(user.getBalance());
-            //point.getPointRecords().add(records);
             pointRepository.save(point);
             pointRecordRepository.save(records);
             return user;

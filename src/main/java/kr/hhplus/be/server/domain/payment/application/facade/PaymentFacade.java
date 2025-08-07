@@ -8,12 +8,15 @@ import kr.hhplus.be.server.domain.payment.application.dto.PaymentRequest;
 import kr.hhplus.be.server.domain.payment.application.dto.PaymentResponse;
 import kr.hhplus.be.server.domain.payment.application.service.PaymentService;
 import kr.hhplus.be.server.domain.product.application.facade.InventoryFacade;
+import kr.hhplus.be.server.domain.product.exception.OutOfStockException;
+import kr.hhplus.be.server.domain.product.exception.RestoreOutOfStockException;
 import kr.hhplus.be.server.domain.user.application.AlreadyProcessedPointException;
 import kr.hhplus.be.server.domain.user.application.Users;
 import kr.hhplus.be.server.domain.user.application.service.UserService;
 import kr.hhplus.be.server.domain.user.exception.InsufficientBalanceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,8 +75,17 @@ public class PaymentFacade {
             orderService.orderFailed(order);
         }
 
-        // 3) 재고 복구
-        inventoryFacade.restoreStock(order);
+        if(cause instanceof RestoreOutOfStockException){
+            // todo: 주문 실패
+        }else if(cause instanceof InsufficientBalanceException || // 잔고 부족
+                cause instanceof AlreadyProcessedPointException || // 처리된 포인트
+                cause instanceof AlreadyProcessedOrderException // 처리된 주문
+                //cause instanceof ObjectOptimisticLockingFailureException // 처리된 주문 2
+        ){
+            // 3) 재고 복구
+            inventoryFacade.restoreStock(order);
+        }
+
 
     }
 

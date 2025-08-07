@@ -17,7 +17,7 @@ public interface OrderJpaRepository extends JpaRepository<OrderJpaEntity, Long> 
 
     Optional<OrderJpaEntity> findByOrderCode(String code);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Lock(LockModeType.OPTIMISTIC)
     @Query("select o from OrderJpaEntity o where o.orderId = :orderId")
     Optional<OrderJpaEntity> findByIdWithLock(@Param("orderId") Long id);
 
