@@ -22,6 +22,11 @@ public class CouponJpaRepositoryAdapter implements CouponRepository {
     }
 
     @Override
+    public Optional<Coupon> findByIdWithPessimisticLock(Long cId) {
+        return couponJpaRepository.findByIdForUpdate(cId).map(CouponJpaEntity::toDomain);
+    }
+
+    @Override
     public List<Coupon> findAll() {
         return couponJpaRepository.findAll().stream().map(CouponJpaEntity::toDomain).toList();
     }
