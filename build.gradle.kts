@@ -63,6 +63,14 @@ dependencies {
 	testCompileOnly ("org.projectlombok:lombok:1.18.30")
 	testAnnotationProcessor ("org.projectlombok:lombok:1.18.30")
 
+	//Retry
+	implementation ("org.springframework.retry:spring-retry")
+	implementation ("org.springframework:spring-aspects")
+
+	// redis
+	implementation ("org.redisson:redisson-spring-boot-starter:3.27.2")
+
+
 }
 
 
