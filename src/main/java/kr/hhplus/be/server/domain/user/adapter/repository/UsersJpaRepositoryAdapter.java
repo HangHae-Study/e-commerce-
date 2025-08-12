@@ -35,4 +35,8 @@ public class UsersJpaRepositoryAdapter implements UserRepository {
     public void deleteById(Long aLong) {
 
     }
+
+    public void deleteAll(){
+        usersJpaRepository.deleteAll();
+    }
 }

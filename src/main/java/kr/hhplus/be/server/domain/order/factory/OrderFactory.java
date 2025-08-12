@@ -7,6 +7,7 @@ import kr.hhplus.be.server.domain.order.mapper.OrderMapper;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 // OrderFactory.java
 public class OrderFactory {
@@ -29,7 +30,7 @@ public class OrderFactory {
                         .status("O_MAKE")
                         .updateDt(LocalDateTime.now())
                         .build())
-                .toList();
+                .collect(Collectors.toList());
 
         return Order.builder()
                 .orderId(orderId)

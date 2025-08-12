@@ -5,6 +5,7 @@ import kr.hhplus.be.server.domain.user.application.dto.PointDao;
 import kr.hhplus.be.server.domain.user.application.repository.PointRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -23,6 +24,12 @@ public class PointJpaRepositoryAdapter implements PointRepository {
     }
 
     @Override
+    public Optional<PointDao> findByIdWithPessimisticLock(Long userId) {
+        return pointJpaRepository.findByUserIdForUpdate(userId)
+                .map(PointJpaEntity::toDao);
+    }
+
+    @Override
     public Optional<PointDao> findById(Long aLong) {
         return Optional.empty();
     }
@@ -32,13 +39,18 @@ public class PointJpaRepositoryAdapter implements PointRepository {
         return List.of();
     }
 
+    @Transactional
     @Override
     public PointDao save(PointDao point) {
-        return null;
+        return pointJpaRepository.save(PointJpaEntity.fromDomain(point)).toDao();
     }
 
     @Override
     public void deleteById(Long aLong) {
 
+    }
+
+    public void deleteAll(){
+        pointJpaRepository.deleteAll();
     }
 }
