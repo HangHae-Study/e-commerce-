@@ -63,7 +63,7 @@ public class CouponIssueUseCaseTest {
             given(codeGenerator.generate(coupon, 42L, coupon.getRemaining())).willReturn("ABC-123");
 
             // when
-            CouponIssue issue = coupon.issueTo(42L, codeGenerator);
+            CouponIssue issue = coupon.issueTo(42L, "ABC-123");
 
             // then: 남은 수량이 1 줄어든다
             assertThat(coupon.getRemaining()).isEqualTo(4L);
@@ -83,7 +83,7 @@ public class CouponIssueUseCaseTest {
                     .expireDate(LocalDateTime.now().plusDays(7))
                     .build();
 
-            assertThatThrownBy(() -> coupon.issueTo(42L, codeGenerator))
+            assertThatThrownBy(() -> coupon.issueTo(42L, ""))
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessage("쿠폰 발급에 실패하였습니다.");
         }
