@@ -5,20 +5,16 @@ import static org.mockito.BDDMockito.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 import kr.hhplus.be.server.domain.coupon.application.CouponIssue;
 import kr.hhplus.be.server.domain.coupon.application.service.CouponService;
 import kr.hhplus.be.server.domain.order.application.Order;
-import kr.hhplus.be.server.domain.order.application.OrderLine;
 import kr.hhplus.be.server.domain.order.application.facade.OrderFacade;
 import kr.hhplus.be.server.domain.order.application.service.OrderService;
 import kr.hhplus.be.server.domain.order.controller.dto.OrderCreateRequest;
 import kr.hhplus.be.server.domain.order.controller.dto.OrderCreateResponse;
-import kr.hhplus.be.server.domain.order.mapper.OrderMapper;
-import kr.hhplus.be.server.domain.order.testinstance.OrderTestInstance;
+import kr.hhplus.be.server.domain.order.command.mapper.OrderMapper;
 import kr.hhplus.be.server.domain.order.testinstance.OrderUseCaseInstance;
 import kr.hhplus.be.server.domain.user.application.Users;
 import kr.hhplus.be.server.domain.user.application.service.UserService;

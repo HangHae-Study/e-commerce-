@@ -46,9 +46,8 @@ public class UserPointLockTest {
         private PointRepository pointRepository;
 
         @Test
-        @DisplayName("Concurrent chargePointWithLock should accumulate balance correctly")
         @Sql("classpath:sql/lock/UserPoint.sql")
-        void concurrentChargePointWithLock() {
+        void 포인트_동시_충전_락_동시성_테스트() {
             int threads = 10;
             BigDecimal amount = BigDecimal.valueOf(100);
 
@@ -58,6 +57,7 @@ public class UserPointLockTest {
                     .mapToObj(i -> CompletableFuture.supplyAsync(() -> {
                         try{
                             userService.chargePointWithLock(1L, amount, "REQ-" + i);
+                            //userService.chargePoint(1L, amount);
                             return true;
                         }catch(Exception ex){
                             System.out.println(ex);
@@ -77,8 +77,7 @@ public class UserPointLockTest {
 
         @Test
         @Sql("classpath:sql/lock/UserPoint.sql")
-        @DisplayName("Concurrent payPointWithLock should deduct balance correctly")
-        void concurrentPayPointWithLock() {
+        void 포인트_동시_사용_락_동시성_테스트() {
             int threads = 5;
             BigDecimal chargeAmount = BigDecimal.valueOf(200);
             BigDecimal useAmount = BigDecimal.valueOf(50);
