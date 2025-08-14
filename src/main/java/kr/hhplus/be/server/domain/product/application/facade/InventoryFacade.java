@@ -39,15 +39,6 @@ public class InventoryFacade {
     }
 
     @Transactional
-    public void restoreStock(List<OrderLine> lines, int var) {
-        lines.forEach(line -> {
-            ProductLine pl = productLineService.getProductLine(line.getProductLineId());
-            pl.increaseStock((long) line.getQuantity());
-            productLineService.updateProductLine(pl);
-        });
-    }
-
-    @Transactional
     public void restoreStock(Order order) {
         order.getOrderLines().forEach(line -> {
             ProductLine pl = productLineService.getProductLine(line.getProductLineId());

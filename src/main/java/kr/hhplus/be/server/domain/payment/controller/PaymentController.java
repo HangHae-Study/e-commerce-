@@ -1,7 +1,6 @@
 package kr.hhplus.be.server.domain.payment.controller;
 
-import kr.hhplus.be.server.domain.payment.application.dto.PaymentRequest;
-import kr.hhplus.be.server.domain.payment.application.dto.PaymentResponse;
+import kr.hhplus.be.server.domain.payment.command.PaymentCreateCommand.*;
 import kr.hhplus.be.server.domain.payment.application.facade.PaymentFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,17 +18,4 @@ public class PaymentController {
         return ResponseEntity.ok(resp);
     }
 
-    /*
-    @ExceptionHandler(InsufficientInventoryException.class)
-    public ResponseEntity<String> handleInventory(InsufficientInventoryException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(ex.getMessage());
-    }
-
-    @ExceptionHandler(InsufficientBalanceException.class)
-    public ResponseEntity<String> handleBalance(InsufficientBalanceException ex) {
-        return ResponseEntity.badRequest()
-                .body(ex.getMessage());
-    }
-    */
 }

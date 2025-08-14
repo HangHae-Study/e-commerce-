@@ -5,7 +5,7 @@ import kr.hhplus.be.server.TestcontainersConfiguration;
 import kr.hhplus.be.server.domain.order.application.facade.OrderFacade;
 import kr.hhplus.be.server.domain.order.application.service.OrderService;
 import kr.hhplus.be.server.domain.payment.application.Payment;
-import kr.hhplus.be.server.domain.payment.application.dto.PaymentRequest;
+import kr.hhplus.be.server.domain.payment.command.PaymentCreateCommand.*;
 import kr.hhplus.be.server.domain.payment.application.facade.PaymentFacade;
 import kr.hhplus.be.server.domain.payment.application.repository.PaymentRepository;
 import kr.hhplus.be.server.domain.payment.application.service.PaymentService;
@@ -151,7 +151,7 @@ public class PaymentLockTest {
             ExecutorService executor = Executors.newFixedThreadPool(20);
             PaymentRequest req = new PaymentRequest(orderCode);
             List<CompletableFuture<Boolean>> futures =
-                    IntStream.rangeClosed(1, 20)
+                    IntStream.rangeClosed(1, 100)
                             .mapToObj(i -> CompletableFuture.supplyAsync(() -> {
                                 try {
                                     paymentFacade.process(req);
@@ -185,7 +185,7 @@ public class PaymentLockTest {
             long failureCount = results.stream().filter(b -> !b).count();
 
             // 정확히 하나만 성공, 나머지는 실패
-            //assertThat(successCount).isEqualTo(1);
+            assertThat(successCount).isEqualTo(1);
             assertThat(failureCount).isNotEqualTo(1);
 
             // 결제 레코드는 하나만 생성됐는지 확인
