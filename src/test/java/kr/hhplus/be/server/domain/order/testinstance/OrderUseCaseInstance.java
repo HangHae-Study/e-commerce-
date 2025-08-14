@@ -5,7 +5,7 @@ import kr.hhplus.be.server.domain.order.application.Order;
 import kr.hhplus.be.server.domain.order.application.OrderLine;
 import kr.hhplus.be.server.domain.order.controller.dto.OrderCreateRequest;
 import kr.hhplus.be.server.domain.order.controller.dto.OrderCreateResponse;
-import kr.hhplus.be.server.domain.order.mapper.OrderMapper;
+import kr.hhplus.be.server.domain.order.command.mapper.OrderMapper;
 import kr.hhplus.be.server.domain.user.application.Users;
 
 import java.math.BigDecimal;

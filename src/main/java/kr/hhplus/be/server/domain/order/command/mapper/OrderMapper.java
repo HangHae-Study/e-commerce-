@@ -1,9 +1,9 @@
-package kr.hhplus.be.server.domain.order.mapper;
+package kr.hhplus.be.server.domain.order.command.mapper;
 
 import kr.hhplus.be.server.domain.order.application.Order;
 import kr.hhplus.be.server.domain.order.controller.dto.OrderCreateRequest;
 import kr.hhplus.be.server.domain.order.controller.dto.OrderCreateResponse;
-import kr.hhplus.be.server.domain.order.factory.OrderFactory;
+import kr.hhplus.be.server.domain.order.command.factory.OrderFactory;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;

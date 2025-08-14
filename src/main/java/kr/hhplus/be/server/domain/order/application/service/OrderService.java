@@ -1,18 +1,13 @@
 package kr.hhplus.be.server.domain.order.application.service;
 
-import kr.hhplus.be.server.domain.coupon.application.CouponIssue;
 import kr.hhplus.be.server.domain.order.application.Order;
 import kr.hhplus.be.server.domain.order.application.OrderLine;
-import kr.hhplus.be.server.domain.order.controller.dto.OrderCreateRequest;
 import kr.hhplus.be.server.domain.order.application.repository.OrderLineRepository;
 import kr.hhplus.be.server.domain.order.application.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -43,13 +38,12 @@ public class OrderService {
 
 
     @Transactional
-    public void orderComplete(Order order) {
+    public Order orderComplete(Order order) {
         order.complete();
         for (OrderLine orderLine : order.getOrderLines()) {
             orderLine.complete();
         }
-
-        orderRepository.save(order);
+        return orderRepository.save(order);
     }
 
     @Transactional
@@ -58,7 +52,6 @@ public class OrderService {
         for (OrderLine orderLine : order.getOrderLines()) {
             orderLine.fail();
         }
-
         orderRepository.save(order);
     }
 }

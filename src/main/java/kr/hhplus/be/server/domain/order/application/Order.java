@@ -3,10 +3,7 @@ package kr.hhplus.be.server.domain.order.application;
 import jakarta.annotation.PostConstruct;
 import kr.hhplus.be.server.common.optimistic.VersionedDomain;
 import kr.hhplus.be.server.domain.order.application.exception.AlreadyProcessedOrderException;
-import kr.hhplus.be.server.domain.order.controller.dto.OrderCreateRequest;
-import lombok.Builder;
 import lombok.Data;
-import lombok.Singular;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
@@ -38,6 +35,10 @@ public class Order extends VersionedDomain {
 
         updateDt = LocalDateTime.now();
         setStatus("O_FAIL");
+    }
+
+    public boolean isWaitedOrder(){
+        return "O_MAKE".equals(status);
     }
 
     @PostConstruct

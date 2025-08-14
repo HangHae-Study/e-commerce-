@@ -1,8 +1,8 @@
-package kr.hhplus.be.server.domain.order.factory;
+package kr.hhplus.be.server.domain.order.command.factory;
 
 import kr.hhplus.be.server.domain.order.application.Order;
 import kr.hhplus.be.server.domain.order.application.OrderLine;
-import kr.hhplus.be.server.domain.order.mapper.OrderMapper;
+import kr.hhplus.be.server.domain.order.command.mapper.OrderMapper;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
