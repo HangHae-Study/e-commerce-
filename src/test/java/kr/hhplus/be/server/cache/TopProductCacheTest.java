@@ -1,19 +1,26 @@
 package kr.hhplus.be.server.cache;
 
+import kr.hhplus.be.server.TestDataSourceProxyConfig;
+import kr.hhplus.be.server.TestcontainersConfiguration;
 import kr.hhplus.be.server.domain.coupon.adapter.repository.CouponIssueJpaRepository;
 import kr.hhplus.be.server.domain.order.adapter.projection.BestSellingProductLineProjection;
 import kr.hhplus.be.server.domain.order.adapter.repository.OrderLineJpaRepository;
+import kr.hhplus.be.server.domain.order.application.repository.OrderLineRepository;
 import kr.hhplus.be.server.domain.order.application.service.OrderService;
 import kr.hhplus.be.server.domain.order.command.TopOrderProductCommand;
 import kr.hhplus.be.server.domain.product.application.ProductLine;
 import kr.hhplus.be.server.domain.product.application.facade.ProductFacade;
 import kr.hhplus.be.server.domain.product.application.repository.ProductLineRepository;
+import net.ttddyy.dsproxy.QueryCount;
+import net.ttddyy.dsproxy.QueryCountHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDate;
@@ -23,6 +30,12 @@ import java.util.NoSuchElementException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+//@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import({
+    TestcontainersConfiguration.class,
+    TestDataSourceProxyConfig.class
+
+})
 @SpringBootTest
 @Sql(scripts = {
         "classpath:sql/cleanup.sql",
@@ -32,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class TopProductCacheTest {
 
     @Autowired
-    OrderLineJpaRepository orderLineRepo;
+    OrderLineRepository orderLineRepo;
 
     @Autowired
     ProductLineRepository productLineRepository;
@@ -104,5 +117,47 @@ public class TopProductCacheTest {
         assertThat(topItems).hasSizeLessThanOrEqualTo(5);
 
         System.out.println(topItems);
+    }
+
+    @ParameterizedTest(name = "[{index}] start={0}, end={1}")
+    @CsvSource({
+            //"2025-08-01, 2025-08-03",
+            "2025-08-12, 2025-08-14"
+    })
+    @DisplayName("4. 퍼포먼스 확인")
+    void cachePerformance(String dateS, String dateE ){
+        LocalDate start = LocalDate.parse(dateS);
+        LocalDate end = LocalDate.parse(dateE);
+
+        QueryCountHolder.clear();
+
+        final long missNanos = measureNanos(() -> {
+            for(int i = 0; i<500; i++){
+                List<ProductLine> r = productFacade.getTopProductItems(start, end);
+
+                if(i == 0){
+                    assertThat(r).isNotEmpty();
+                    assertThat(r).hasSizeLessThanOrEqualTo(5);
+                }
+
+            }
+
+        });
+
+        QueryCount miss = QueryCountHolder.getGrandTotal();
+
+        System.out.printf(
+                "\n[%s ~ %s]\n" +
+                        "HIT: time=%.2f ms, totalQ=%d (select=%d, insert=%d, update=%d)\n",
+                start, end,
+                missNanos / 1_000_000.0, miss.getTotal(), miss.getSelect(), miss.getInsert(), miss.getUpdate()
+        );
+
+    }
+
+    private static long measureNanos(Runnable r) {
+        long s = System.nanoTime();
+        r.run();
+        return System.nanoTime() - s;
     }
 }

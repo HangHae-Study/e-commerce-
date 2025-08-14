@@ -70,6 +70,7 @@ dependencies {
 	// redis
 	implementation ("org.redisson:redisson-spring-boot-starter:3.27.2")
 
+	testImplementation("net.ttddyy:datasource-proxy:1.9")
 
 }
 
