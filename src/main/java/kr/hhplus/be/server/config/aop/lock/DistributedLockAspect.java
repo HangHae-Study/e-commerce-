@@ -19,10 +19,7 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Aspect
@@ -60,21 +57,31 @@ public class DistributedLockAspect {
             }
         }
 
-        // 2) 자원별 키 생성(정렬해 데드락 예방)
-        List<String> keys = Arrays.stream(distributedLock.keys())
-                .sorted(Comparator.comparing(k -> k.resource().name()))
-                .map(k -> {
-                    Object v = parser.parseExpression(k.key()).getValue(ctx);
-                    if (v == null) {
-                        throw new IllegalArgumentException("DistributedLock key evaluated to null: " + k);
-                    }
-                    String ns = NS.get(k.resource());
-                    if (ns == null) {
-                        throw new IllegalStateException("No namespace for resource: " + k.resource());
-                    }
-                    return ns + v;
-                })
-                .collect(Collectors.toList());
+        // 2) 자원별 키 생성 (단일 값 + 컬렉션 모두 지원, 정렬/중복제거로 데드락 예방)
+        List<String> keys = new ArrayList<>();
+
+        for (ResourceKey rk : distributedLock.keys()) {
+            String ns = NS.get(rk.resource());
+            Object v = parser.parseExpression(rk.key()).getValue(ctx);
+
+            if (ns == null) {
+                throw new IllegalStateException("No namespace for resource: " + rk.resource());
+            }
+
+            if (v == null) {
+                throw new IllegalArgumentException("DistributedLock key evaluated to null: " + rk);
+            }
+
+            if(v instanceof Collection<?> col){
+                //System.out.println("col  : " + rk);
+                for(Object key : col){
+                    if(key == null) throw new IllegalArgumentException("Lock key element is null: " + rk);
+                    keys.add(ns + key);
+                }
+            }else{
+                keys.add(ns + v);
+            }
+        }
 
         if (keys.isEmpty()) {
             throw new IllegalArgumentException("@DistributedLock.keys is empty");
@@ -84,6 +91,10 @@ public class DistributedLockAspect {
         RLock lock = (keys.size() == 1)
                 ? redisson.getLock(keys.get(0))
                 : new RedissonMultiLock(keys.stream().map(redisson::getLock).toArray(RLock[]::new));
+
+        for(String s : keys){
+            System.out.println("key : " + s);
+        }
 
         boolean acquired = false;
         try {
