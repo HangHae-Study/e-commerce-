@@ -1,13 +1,17 @@
 package kr.hhplus.be.server.domain.order.application.service;
 
+import kr.hhplus.be.server.domain.order.adapter.projection.BestSellingProductLineProjection;
 import kr.hhplus.be.server.domain.order.application.Order;
 import kr.hhplus.be.server.domain.order.application.OrderLine;
 import kr.hhplus.be.server.domain.order.application.repository.OrderLineRepository;
 import kr.hhplus.be.server.domain.order.application.repository.OrderRepository;
+import kr.hhplus.be.server.domain.order.command.TopOrderProductCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -53,5 +57,15 @@ public class OrderService {
             orderLine.fail();
         }
         orderRepository.save(order);
+    }
+
+    public List<TopOrderProductCommand.TopOrderProductResponse> getTopOrderProduct(LocalDate start, LocalDate end){
+        return orderLineRepository.findTop5ByOrderDtBetween(start, end)
+                .stream().map(
+                        v -> {
+                            return new TopOrderProductCommand.TopOrderProductResponse(
+                                v.getProductLineId(), v.getTotalQuantity()
+                            );
+                        }).toList();
     }
 }

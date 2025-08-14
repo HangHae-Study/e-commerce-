@@ -26,7 +26,10 @@ public class ProductLineJpaRepositoryAdapter implements ProductLineRepository {
 
     @Override
     public List<ProductLine> findAll() {
-        return null;
+        return productLineJpaRepository.findAll()
+                .stream().map(
+                        ProductLineJpaEntity::toDomain
+                ).toList();
     }
 
     @Override
