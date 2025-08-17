@@ -3,28 +3,23 @@ package kr.hhplus.be.server.concurrency.transaction;
 
 import kr.hhplus.be.server.TestcontainersConfiguration;
 import kr.hhplus.be.server.domain.order.application.service.OrderService;
-import kr.hhplus.be.server.domain.payment.application.dto.PaymentRequest;
+import kr.hhplus.be.server.domain.payment.command.PaymentCreateCommand.*;
 import kr.hhplus.be.server.domain.payment.application.facade.PaymentFacade;
 import kr.hhplus.be.server.domain.payment.application.service.PaymentService;
 import kr.hhplus.be.server.domain.product.application.ProductLine;
 import kr.hhplus.be.server.domain.product.application.repository.ProductLineRepository;
-import kr.hhplus.be.server.domain.product.exception.OutOfStockException;
-import kr.hhplus.be.server.domain.user.application.Users;
 import kr.hhplus.be.server.domain.user.application.dto.PointDao;
 import kr.hhplus.be.server.domain.user.application.repository.PointRepository;
 import kr.hhplus.be.server.domain.user.application.service.UserService;
-import kr.hhplus.be.server.domain.user.exception.InsufficientBalanceException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 

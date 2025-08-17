@@ -1,5 +1,9 @@
 package kr.hhplus.be.server.domain.coupon.application.service;
 
+import kr.hhplus.be.server.config.aop.lock.DistributedLock;
+import kr.hhplus.be.server.config.aop.lock.LockType;
+import kr.hhplus.be.server.config.aop.lock.Resource;
+import kr.hhplus.be.server.config.aop.lock.ResourceKey;
 import kr.hhplus.be.server.domain.coupon.application.Coupon;
 import kr.hhplus.be.server.domain.coupon.application.CouponIssue;
 import kr.hhplus.be.server.domain.coupon.application.exception.InvalidCouponException;
@@ -33,14 +37,18 @@ public class CouponService {
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 쿠폰 입니다."));
     }
 
+    @DistributedLock(
+            type = LockType.COUPON,
+            keys = { @ResourceKey(resource = Resource.COUPON, key = "#couponId") }
+    )
     @Transactional
     public CouponIssue newCouponIssue(Long userId, Long couponId) {
-        Coupon coupon = couponRepository.findByIdWithPessimisticLock(couponId)
-                //couponRepository.findById(couponId)
+        Coupon coupon = //couponRepository.findByIdWithPessimisticLock(couponId)
+                couponRepository.findById(couponId)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 쿠폰입니다."));
 
-        // 쿠폰이 스스로 발급 로직을 수행 → 남은 수량 감소, CouponIssue 생성
-        CouponIssue issue = coupon.issueTo(userId, codeGenerator);
+        String code = codeGenerator.generate(coupon, coupon.getCouponId(), coupon.getRemaining());
+        CouponIssue issue = coupon.issueTo(userId, code);
 
         // 변경된 coupon, 발급된 issue 둘 다 저장
         couponRepository.save(coupon);
@@ -61,6 +69,7 @@ public class CouponService {
         return ci;
     }
 
+    @Transactional
     public CouponIssue couponAppliedByOrder(Long userId, String cCode){
         if(cCode.isEmpty() || cCode.isBlank()){
             return null;
@@ -74,6 +83,7 @@ public class CouponService {
         return ci;
     }
 
+    @Transactional
     public CouponIssue getCouponIssueForRestore(Long userId, String couponCode){
         if(couponCode.isEmpty() || couponCode.isBlank()){
             return null;

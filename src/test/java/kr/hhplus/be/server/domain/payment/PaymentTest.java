@@ -10,8 +10,8 @@ import java.util.Optional;
 
 import kr.hhplus.be.server.domain.order.application.service.OrderService;
 import kr.hhplus.be.server.domain.payment.application.Payment;
-import kr.hhplus.be.server.domain.payment.application.dto.PaymentRequest;
-import kr.hhplus.be.server.domain.payment.application.dto.PaymentResponse;
+import kr.hhplus.be.server.domain.payment.command.PaymentCreateCommand.PaymentRequest;
+import kr.hhplus.be.server.domain.payment.command.PaymentCreateCommand.PaymentResponse;
 import kr.hhplus.be.server.domain.payment.application.facade.PaymentFacade;
 import kr.hhplus.be.server.domain.payment.application.repository.PaymentRepository;
 import kr.hhplus.be.server.domain.payment.application.service.PaymentService;

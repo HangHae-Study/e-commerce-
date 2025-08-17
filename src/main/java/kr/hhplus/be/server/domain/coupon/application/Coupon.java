@@ -30,11 +30,10 @@ public class Coupon {
         this.remaining --;
     }
 
-    public CouponIssue issueTo(Long userId, CouponCodeGenerator codeGen) {
+    public CouponIssue issueTo(Long userId, String code) {
         if (!hasRemaining()) {
             throw new IllegalStateException("쿠폰 발급에 실패하였습니다.");
         }
-        String code = codeGen.generate(this, userId, remaining);
         decrease();
         return CouponIssue.issueNew(this, userId, code);
     }

@@ -1,5 +1,9 @@
 package kr.hhplus.be.server.domain.user.application.service;
 
+import kr.hhplus.be.server.config.aop.lock.DistributedLock;
+import kr.hhplus.be.server.config.aop.lock.LockType;
+import kr.hhplus.be.server.config.aop.lock.Resource;
+import kr.hhplus.be.server.config.aop.lock.ResourceKey;
 import kr.hhplus.be.server.domain.user.application.AlreadyProcessedPointException;
 import kr.hhplus.be.server.domain.user.application.Users;
 import kr.hhplus.be.server.domain.user.application.dto.PointDao;
@@ -36,10 +40,9 @@ public class UserService {
          return user;
     }
 
-    @Transactional
     public PointDao getPoint(Long userId){
-        PointDao pointDao = //pointRepository.findByUserId(userId)
-                pointRepository.findByIdWithPessimisticLock(userId)
+        PointDao pointDao = pointRepository.findByUserId(userId)
+                //pointRepository.findByIdWithPessimisticLock(userId)
                 .orElseGet(() -> {
                     PointDao newP = PointDao.builder()
                             .userId(userId)
@@ -68,6 +71,11 @@ public class UserService {
         return user;
     }
 
+
+    @DistributedLock(
+            type = LockType.POINT,
+            keys = { @ResourceKey(resource = Resource.POINT, key = "#userId")}
+    )
     @Transactional
     public Users chargePointWithLock(Long userId, Object amount, String reqId){
         PointDao point = getPoint(userId);
@@ -99,6 +107,10 @@ public class UserService {
         return user;
     }
 
+    @DistributedLock(
+            type = LockType.COUPON,
+            keys = { @ResourceKey(resource = Resource.POINT, key = "#userId")}
+    )
     @Transactional
     public Users payPointWithLock(Long userId, Object amount, String reqId){
         PointDao point = getPoint(userId);

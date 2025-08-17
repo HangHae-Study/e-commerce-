@@ -102,6 +102,7 @@ public class CouponLockTest {
                             couponService.newCouponIssue(userId, couponId);
                             return true;
                         } catch (Exception ex) {
+                            System.out.println(ex);
                             return false;
                         }
                     }, executor))

@@ -6,12 +6,10 @@ import kr.hhplus.be.server.domain.order.adapter.repository.OrderLineJpaRepositor
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Sql(scripts = {
         "classpath:sql/cleanup.sql",
         "classpath:sql/schema.sql",
-        "classpath:sql/index.jpa/noindex_scen.sql"
+        "classpath:sql/index.jpa/noindex_scan.sql"
 }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class JpaNoIndexIntegrationTest {
 
@@ -30,8 +28,8 @@ public class JpaNoIndexIntegrationTest {
     @Autowired
     CouponIssueJpaRepository couponIssueRepo;
 
-    private final LocalDateTime START = LocalDateTime.parse("2025-07-29T00:00:00");
-    private final LocalDateTime END = LocalDateTime.parse("2025-08-01T00:00:00");
+    private final LocalDate START = LocalDate.parse("2025-07-29");
+    private final LocalDate END = LocalDate.parse("2025-08-01");
 
     @Test
     @DisplayName("1. 최근 3일 완료 주문의 Top-5 판매량 상품라인")

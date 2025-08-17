@@ -20,8 +20,9 @@ public class ProductLineService {
 
     public ProductLine getProductLine(Long productId){
         // Step 09 : 비관적 락으로 수정
-        return productLineRepository.findByIdWithPessimisticLock(productId)
-                //productLineRepository.findById(productId)
+        // Step 11 : 일반 조회로 수정
+        return //productLineRepository.findByIdWithPessimisticLock(productId)
+                productLineRepository.findById(productId)
                 .orElseThrow(() -> new NoSuchElementException("올바르지 않은 상품입니다"));
     }
 

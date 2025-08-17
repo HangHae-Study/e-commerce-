@@ -1,9 +1,7 @@
 package kr.hhplus.be.server.domain.order;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.hhplus.be.server.domain.order.application.facade.OrderFacade;
 import kr.hhplus.be.server.domain.order.controller.dto.OrderCreateRequest;
-import kr.hhplus.be.server.domain.order.controller.dto.OrderCreateResponse;
 import kr.hhplus.be.server.domain.user.application.Users;
 import kr.hhplus.be.server.domain.user.application.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;

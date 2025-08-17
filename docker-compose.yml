@@ -12,6 +12,14 @@ services:
     volumes:
       - ~/Projects/data/mysql/:/var/lib/mysql
 
+  redis:
+    image: redis:7.2
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - ~/Projects/data/redis:/data
+
 networks:
   default:
     driver: bridge

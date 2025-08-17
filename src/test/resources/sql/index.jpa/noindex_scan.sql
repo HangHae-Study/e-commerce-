@@ -1,4 +1,4 @@
--- src/test/resources/sql/noindex_scen.sql
+-- src/test/resources/sql/noindex_scan.sql
 
 -- (A) users
 INSERT INTO users(user_id, username) VALUES (1, 'user1');
