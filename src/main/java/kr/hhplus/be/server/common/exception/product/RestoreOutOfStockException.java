@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.domain.product.exception;
+package kr.hhplus.be.server.common.exception.product;
 
 import kr.hhplus.be.server.domain.order.application.OrderLine;
 import lombok.Getter;

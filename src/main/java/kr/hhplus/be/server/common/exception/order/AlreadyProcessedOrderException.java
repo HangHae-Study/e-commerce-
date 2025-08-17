@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.domain.order.application.exception;
+package kr.hhplus.be.server.common.exception.order;
 
 public class AlreadyProcessedOrderException extends RuntimeException{
     private String orderCode;

@@ -2,7 +2,7 @@ package kr.hhplus.be.server.domain.order.application;
 
 import jakarta.annotation.PostConstruct;
 import kr.hhplus.be.server.common.optimistic.VersionedDomain;
-import kr.hhplus.be.server.domain.order.application.exception.AlreadyProcessedOrderException;
+import kr.hhplus.be.server.common.exception.order.AlreadyProcessedOrderException;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 

@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.domain.user.application;
 
-import kr.hhplus.be.server.domain.user.exception.InsufficientBalanceException;
+import kr.hhplus.be.server.common.exception.user.InsufficientBalanceException;
 import lombok.Builder;
 import lombok.Data;
 

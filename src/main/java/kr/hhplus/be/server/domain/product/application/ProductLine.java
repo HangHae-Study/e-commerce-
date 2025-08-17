@@ -1,9 +1,8 @@
 package kr.hhplus.be.server.domain.product.application;
 
-import kr.hhplus.be.server.domain.product.exception.OutOfStockException;
+import kr.hhplus.be.server.common.exception.product.OutOfStockException;
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.data.repository.query.ParameterOutOfBoundsException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

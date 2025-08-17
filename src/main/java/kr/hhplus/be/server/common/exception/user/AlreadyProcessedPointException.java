@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.domain.user.application;
+package kr.hhplus.be.server.common.exception.user;
 
 public class AlreadyProcessedPointException extends RuntimeException{
     private final Long pointId;

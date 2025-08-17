@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.domain.user.exception;
+package kr.hhplus.be.server.common.exception.user;
 
 import lombok.Getter;
 

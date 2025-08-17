@@ -4,7 +4,7 @@ import kr.hhplus.be.server.config.aop.lock.DistributedLock;
 import kr.hhplus.be.server.config.aop.lock.LockType;
 import kr.hhplus.be.server.config.aop.lock.Resource;
 import kr.hhplus.be.server.config.aop.lock.ResourceKey;
-import kr.hhplus.be.server.domain.user.application.AlreadyProcessedPointException;
+import kr.hhplus.be.server.common.exception.user.AlreadyProcessedPointException;
 import kr.hhplus.be.server.domain.user.application.Users;
 import kr.hhplus.be.server.domain.user.application.dto.PointDao;
 import kr.hhplus.be.server.domain.user.application.dto.PointRecordDao;

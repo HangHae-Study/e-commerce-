@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.domain.coupon.application.exception;
+package kr.hhplus.be.server.common.exception.coupon;
 
 /**
  * 쿠폰 코드가 올바르지 않거나 존재하지 않을 때 던지는 예외입니다.
