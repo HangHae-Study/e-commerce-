@@ -108,7 +108,7 @@ public class OrderFacade {
             // RestoreOutOfStockException, OutOfStockException
             inventoryFacade.checkStock(order);
 
-            // 2, 유저 포인트 차감
+            // 2. 유저 포인트 차감
             // InsufficientBalanceException
             Users used = userService.payPointWithLock(
                     order.getUserId(),
