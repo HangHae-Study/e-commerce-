@@ -73,7 +73,6 @@ public class DistributedLockAspect {
             }
 
             if(v instanceof Collection<?> col){
-                //System.out.println("col  : " + rk);
                 for(Object key : col){
                     if(key == null) throw new IllegalArgumentException("Lock key element is null: " + rk);
                     keys.add(ns + key);
