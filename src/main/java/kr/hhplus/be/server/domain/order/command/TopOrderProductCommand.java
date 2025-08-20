@@ -18,7 +18,7 @@ public class TopOrderProductCommand {
         }
 
         @Override
-        public Long getTotalQuantity() {
+        public Long getOrderQuantity() {
             return orderQuantity;
         }
     }
