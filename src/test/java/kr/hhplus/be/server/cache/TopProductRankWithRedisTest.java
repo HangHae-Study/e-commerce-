@@ -2,13 +2,20 @@ package kr.hhplus.be.server.cache;
 
 import kr.hhplus.be.server.TestDataSourceProxyConfig;
 import kr.hhplus.be.server.TestcontainersConfiguration;
+import kr.hhplus.be.server.domain.order.adapter.repository.OrderJpaRepositoryAdapter;
+import kr.hhplus.be.server.domain.order.application.Order;
 import kr.hhplus.be.server.domain.order.application.facade.OrderFacade;
+import kr.hhplus.be.server.domain.order.application.repository.OrderRepository;
+import kr.hhplus.be.server.domain.payment.application.facade.PaymentFacade;
+import kr.hhplus.be.server.domain.payment.command.PaymentCreateCommand;
 import kr.hhplus.be.server.domain.product.adapter.cache.TopProductCacheRepository;
+import kr.hhplus.be.server.domain.product.application.ProductLine;
 import kr.hhplus.be.server.domain.product.application.facade.ProductFacade;
 import kr.hhplus.be.server.domain.product.command.ProductRankingDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,7 +36,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Import({
         TestcontainersConfiguration.class,
-        TestDataSourceProxyConfig.class
+        TestDataSourceProxyConfig.class,
+        OrderJpaRepositoryAdapter.class
 
 })
 @SpringBootTest
@@ -71,7 +79,7 @@ public class TopProductRankWithRedisTest {
                 orderItems.add(new ProductRankingDto.ProductItemForRank((long) i, i));
             }
 
-            cacheRepository.increaseTodayRankScores(orderItems);
+            cacheRepository.increaseTodayRankScores(LocalDate.now(), orderItems);
 
             List<ProductRankingDto.ProductRankEntry> result = selectZsetCache("zs:rank:product:realtime" + ":" + LocalDate.now());
 
@@ -100,7 +108,7 @@ public class TopProductRankWithRedisTest {
 
                 try (var mocked = Mockito.mockStatic(LocalDate.class)) {
                     mocked.when(LocalDate::now).thenReturn(range[day]);
-                    cacheRepository.increaseTodayRankScores(orderItems);
+                    cacheRepository.increaseTodayRankScores(range[day], orderItems);
                 }
             }
         }
@@ -124,12 +132,38 @@ public class TopProductRankWithRedisTest {
     @Autowired
     ProductFacade productFacade;
 
+    @Autowired
+    PaymentFacade paymentFacade;
+
+    @Nested
     @Sql(scripts = {
             "classpath:sql/cleanup.sql",
             "classpath:sql/schema.sql",
             "classpath:sql/cache/product_for_cache_data.sql"
     }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     class OrderRankIntegrationTest{
+
+        @Test
+        void cacheDataAfterOrderComplete() {
+            LocalDate value = LocalDate.of(2025, 8, 20);
+
+            for (int i = 1; i <= 10; i++) {
+                String postfix = (i < 10 ? "000" : "00") + i;
+                paymentFacade.process(new PaymentCreateCommand.PaymentRequest("ORD202508" + postfix));
+            }
+
+            List<ProductLine> ranks = productFacade.getTopProductItems(value.minusDays(3), value.minusDays(1));
+            assertThat(ranks).isNotEmpty();
+            System.out.println(ranks);
+
+            try (var mocked = Mockito.mockStatic(LocalDate.class)) {
+                mocked.when(LocalDate::now).thenReturn(value);
+                List<ProductRankingDto.ProductRankEntry> cacheResult = cacheRepository.todaysTopRankZset();
+
+                assertThat(cacheResult).isNotEmpty();
+                System.out.println(cacheResult);
+            }
+        }
 
     }
 

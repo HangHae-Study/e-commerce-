@@ -122,6 +122,7 @@ public class OrderFacade {
 
             // 주문 수량 캐시 반영
             productCacheRepo.increaseTodayRankScores(
+                    order.getOrderDt().toLocalDate(),
                     order.getOrderLines().stream().map(
                             ord -> new ProductRankingDto.ProductItemForRank(ord.getProductLineId(), ord.getQuantity())
                     ).toList()

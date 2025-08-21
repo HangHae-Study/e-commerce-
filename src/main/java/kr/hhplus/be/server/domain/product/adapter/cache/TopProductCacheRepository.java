@@ -65,10 +65,10 @@ public class TopProductCacheRepository {
     }
 
      //1) 주문 성공 시 실시간 ZSET 점수 증가
-    public void increaseTodayRankScores(List<ProductRankingDto.ProductItemForRank> items){
+    public void increaseTodayRankScores(LocalDate day, List<ProductRankingDto.ProductItemForRank> items){
         items.forEach(pl -> {
             redisTemplate.opsForZSet().incrementScore(
-                    keyProvider.realtimeKey(LocalDate.now()),
+                    keyProvider.realtimeKey(day),
                     pl.productLineId(),
                     pl.quantity()
             );

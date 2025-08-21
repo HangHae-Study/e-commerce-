@@ -38,74 +38,83 @@ VALUES
     (30, 6, '상품F 패밀리',   9900.00, 'BASIC',   68, NOW());
 
 
--- 1) 1..100 시퀀스와 매핑 파생 컬럼 생성
-WITH RECURSIVE seq(n) AS (
-    SELECT 1
-    UNION ALL
-    SELECT n + 1 FROM seq WHERE n < 100
-),
-               chosen AS (
-                   SELECT
-                       n                                           AS order_id,
-                       ((n - 1) % 20) + 1                          AS user_id,             -- 1..20 사용자 순환
-    ((n - 1) % 30) + 1                          AS product_line_id,     -- 1..30 PL 순환
-    ((n - 1) % 3) + 1                           AS qty,                 -- 1..3 수량
-    LPAD(CAST(n AS CHAR), 4, '0')               AS seq4,
-    ((n - 1) % 31) + 1                          AS day_in_aug           -- 1..31일 순환
-FROM seq
-    ),
-    priced AS (
-SELECT
-    c.order_id,
-    c.user_id,
-    c.product_line_id,
-    c.qty,
-    c.seq4,
-    c.day_in_aug,
-    pl.product_line_price
-FROM chosen c
-    JOIN product_line pl ON pl.product_line_id = c.product_line_id
-    ),
-    shaped AS (
-SELECT
-    p.order_id,
-    p.user_id,
-    p.product_line_id,
-    p.qty,
-    p.product_line_price,
-    (p.product_line_price * p.qty)          AS line_total,
-    -- 2025년 8월 균등 분포된 날짜/시간
-    TIMESTAMP(CONCAT('2025-08-', LPAD(p.day_in_aug, 2, '0')),
-    MAKETIME(10 + (p.order_id % 8), (p.order_id % 4) * 15, 0)) AS order_dt
-FROM priced p
-    )
+INSERT INTO orders (order_id, user_id, total_price, order_code, status, order_dt, update_dt) VALUES
+ (1,  1,  22000, 'ORD2025080001', 'O_MAKE', '2025-08-15 10:00:00', NOW()),
+ (2,  2,  15000, 'ORD2025080002', 'O_MAKE', '2025-08-16 10:15:00', NOW()),
+ (3,  3,  50000, 'ORD2025080003', 'O_MAKE', '2025-08-17 10:30:00', NOW()),
+ (4,  4,  31000, 'ORD2025080004', 'O_MAKE', '2025-08-18 10:45:00', NOW()),
+ (5,  5,  11000, 'ORD2025080005', 'O_MAKE', '2025-08-19 11:00:00', NOW()),
+ (6,  6,  51500, 'ORD2025080006', 'O_MAKE', '2025-08-20 11:15:00', NOW()),
+ (7,  7,  28500, 'ORD2025080007', 'O_MAKE', '2025-08-21 11:30:00', NOW()),
+ (8,  8,  26000, 'ORD2025080008', 'O_MAKE', '2025-08-22 11:45:00', NOW()),
+ (9,  9,  43000, 'ORD2025080009', 'O_MAKE', '2025-08-23 12:00:00', NOW()),
+ (10, 10, 35500, 'ORD2025080010', 'O_MAKE', '2025-08-24 12:15:00', NOW());
 
--- 2) orders 100건 삽입 (order_id를 1..100으로 명시)
-INSERT INTO orders
-(order_id, user_id, total_price, order_code, status, order_dt, update_dt)
-SELECT
-    s.order_id,
-    s.user_id,
-    s.line_total                                               AS total_price,
-    CONCAT('ORD202508', s.seq4)                                AS order_code,
-    'O_MAKE'                                                   AS status,
-    s.order_dt,
-    NOW()                                                      AS update_dt
-FROM shaped s
-ORDER BY s.order_id;
 
--- 3) order_lines 100건 삽입 (각 주문 1라인, 위와 정합성 유지)
 INSERT INTO order_lines
-(order_id, user_id, product_line_id, quantity, order_line_price, order_dt, order_yymmdd, status, update_dt)
-SELECT
-    s.order_id,
-    s.user_id,
-    s.product_line_id,
-    s.qty,
-    s.product_line_price,
-    s.order_dt,
-    DATE(s.order_dt)                                           AS order_yymmdd,
-    'O_MAKE'                                                   AS status,
-    NOW()                                                      AS update_dt
-FROM shaped s
-ORDER BY s.order_id;
+(order_line_id, order_id, user_id, product_line_id, quantity, order_line_price, order_dt, order_yymmdd, status, update_dt) VALUES
+-- 주문 1 (PL: 1,2)
+(1,  1, 1, 1,  1, 10000, '2025-08-15 10:00:00', '2025-08-15', 'O_MAKE', NOW()),
+(2,  1, 1, 2,  1, 12000, '2025-08-15 10:00:00', '2025-08-15', 'O_MAKE', NOW()),
+
+-- 주문 2 (PL: 3)
+(3,  2, 2, 3,  1, 15000, '2025-08-16 10:15:00', '2025-08-16', 'O_MAKE', NOW()),
+
+-- 주문 3 (PL: 4,5,6)
+(4,  3, 3, 4,  1, 17000, '2025-08-17 10:30:00', '2025-08-17', 'O_MAKE', NOW()),
+(5,  3, 3, 5,  1, 13000, '2025-08-17 10:30:00', '2025-08-17', 'O_MAKE', NOW()),
+(6,  3, 3, 6,  1, 20000, '2025-08-17 10:30:00', '2025-08-17', 'O_MAKE', NOW()),
+
+-- 주문 4 (PL: 7,8)
+(7,  4, 4, 7,  1,  9000, '2025-08-18 10:45:00', '2025-08-18', 'O_MAKE', NOW()),
+(8,  4, 4, 8,  1, 22000, '2025-08-18 10:45:00', '2025-08-18', 'O_MAKE', NOW()),
+
+-- 주문 5 (PL: 9)
+(9,  5, 5, 9,  1, 11000, '2025-08-19 11:00:00', '2025-08-19', 'O_MAKE', NOW()),
+
+-- 주문 6 (PL: 10,11,12)
+(10, 6, 6, 10, 1, 24000, '2025-08-20 11:15:00', '2025-08-20', 'O_MAKE', NOW()),
+(11, 6, 6, 11, 1,  9500, '2025-08-20 11:15:00', '2025-08-20', 'O_MAKE', NOW()),
+(12, 6, 6, 12, 1, 18000, '2025-08-20 11:15:00', '2025-08-20', 'O_MAKE', NOW()),
+
+-- 주문 7 (PL: 13,14)
+(13, 7, 7, 13, 1, 16000, '2025-08-21 11:30:00', '2025-08-21', 'O_MAKE', NOW()),
+(14, 7, 7, 14, 1, 12500, '2025-08-21 11:30:00', '2025-08-21', 'O_MAKE', NOW()),
+
+-- 주문 8 (PL: 15)
+(15, 8, 8, 15, 1, 26000, '2025-08-22 11:45:00', '2025-08-22', 'O_MAKE', NOW()),
+
+-- 주문 9 (PL: 16,17,18)
+(16, 9, 9, 16, 1, 10500, '2025-08-23 12:00:00', '2025-08-23', 'O_MAKE', NOW()),
+(17, 9, 9, 17, 1, 21000, '2025-08-23 12:00:00', '2025-08-23', 'O_MAKE', NOW()),
+(18, 9, 9, 18, 1, 11500, '2025-08-23 12:00:00', '2025-08-23', 'O_MAKE', NOW()),
+
+-- 주문 10 (PL: 19,20)
+(19, 10, 10, 19, 1, 23000, '2025-08-24 12:15:00', '2025-08-24', 'O_MAKE', NOW()),
+(20, 10, 10, 20, 1, 12500, '2025-08-24 12:15:00', '2025-08-24', 'O_MAKE', NOW());
+
+-- 유저 10명
+INSERT INTO users (user_id, username, create_dt, update_dt) VALUES
+    (1, 'user1', NOW(), NOW()),
+    (2, 'user2', NOW(), NOW()),
+    (3, 'user3', NOW(), NOW()),
+    (4, 'user4', NOW(), NOW()),
+    (5, 'user5', NOW(), NOW()),
+    (6, 'user6', NOW(), NOW()),
+    (7, 'user7', NOW(), NOW()),
+    (8, 'user8', NOW(), NOW()),
+    (9, 'user9', NOW(), NOW()),
+    (10, 'user10', NOW(), NOW());
+
+-- 포인트 (userId 연결, 초기 잔고 100000)
+INSERT INTO points (point_id, user_id, balance, update_dt) VALUES
+   (1,  1, 100000.00, NOW()),
+   (2,  2, 100000.00, NOW()),
+   (3,  3, 100000.00, NOW()),
+   (4,  4, 100000.00, NOW()),
+   (5,  5, 100000.00, NOW()),
+   (6,  6, 100000.00, NOW()),
+   (7,  7, 100000.00, NOW()),
+   (8,  8, 100000.00, NOW()),
+   (9,  9, 100000.00, NOW()),
+   (10, 10,100000.00, NOW());
