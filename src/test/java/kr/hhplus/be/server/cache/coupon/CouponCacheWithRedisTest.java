@@ -158,6 +158,24 @@ public class CouponCacheWithRedisTest {
 
             assertThat(status).isEqualTo(ISSUED);
         }
+
+        @Test
+        void 쿠폰_서비스_클레임_1번째_요청_쿠폰발급(){
+            couponCacheRepository.cachingCoupon(coupon);
+            CouponClaimCommand.CouponClaimResponse claim = couponService.couponClaim(1L, 1L, "");
+
+            couponCacheQueue.getQueueSize(1L);
+
+            CouponCacheKeyProvider.CouponClaimStatus status = couponIssuedCacheRepository.getClaimStatus(1L, 1L).get();
+            System.out.println(status);
+
+            List<String> pop = couponCacheQueue.popOldestMembers(1L, 1L);
+            assertThat(pop.size()).isEqualTo(1);
+
+
+            System.out.println(claim);
+            System.out.println(pop);
+        }
     }
 
 }
