@@ -127,7 +127,7 @@ public class TopProductRankWithRedisTest {
     @Sql(scripts = {
             "classpath:sql/cleanup.sql",
             "classpath:sql/schema.sql",
-            "classpath:sql/cache/august_100_data.sql"
+            "classpath:sql/cache/product_for_cache_data.sql"
     }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     class OrderRankIntegrationTest{
 
