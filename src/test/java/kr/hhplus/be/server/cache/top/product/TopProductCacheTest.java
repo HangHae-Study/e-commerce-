@@ -1,10 +1,8 @@
-package kr.hhplus.be.server.cache;
+package kr.hhplus.be.server.cache.top.product;
 
 import kr.hhplus.be.server.TestDataSourceProxyConfig;
 import kr.hhplus.be.server.TestcontainersConfiguration;
-import kr.hhplus.be.server.domain.coupon.adapter.repository.CouponIssueJpaRepository;
 import kr.hhplus.be.server.domain.order.adapter.projection.BestSellingProductLineProjection;
-import kr.hhplus.be.server.domain.order.adapter.repository.OrderLineJpaRepository;
 import kr.hhplus.be.server.domain.order.application.repository.OrderLineRepository;
 import kr.hhplus.be.server.domain.order.application.service.OrderService;
 import kr.hhplus.be.server.domain.order.command.TopOrderProductCommand;
@@ -18,14 +16,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;

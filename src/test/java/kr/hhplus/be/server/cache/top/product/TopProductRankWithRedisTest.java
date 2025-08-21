@@ -1,21 +1,17 @@
-package kr.hhplus.be.server.cache;
+package kr.hhplus.be.server.cache.top.product;
 
 import kr.hhplus.be.server.TestDataSourceProxyConfig;
 import kr.hhplus.be.server.TestcontainersConfiguration;
 import kr.hhplus.be.server.domain.order.adapter.repository.OrderJpaRepositoryAdapter;
-import kr.hhplus.be.server.domain.order.application.Order;
 import kr.hhplus.be.server.domain.order.application.facade.OrderFacade;
-import kr.hhplus.be.server.domain.order.application.repository.OrderRepository;
 import kr.hhplus.be.server.domain.payment.application.facade.PaymentFacade;
 import kr.hhplus.be.server.domain.payment.command.PaymentCreateCommand;
 import kr.hhplus.be.server.domain.product.adapter.cache.TopProductCacheRepository;
 import kr.hhplus.be.server.domain.product.application.ProductLine;
 import kr.hhplus.be.server.domain.product.application.facade.ProductFacade;
 import kr.hhplus.be.server.domain.product.command.ProductRankingDto;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,8 +22,6 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
