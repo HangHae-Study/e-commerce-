@@ -6,6 +6,7 @@ import kr.hhplus.be.server.config.aop.lock.Resource;
 import kr.hhplus.be.server.config.aop.lock.ResourceKey;
 import kr.hhplus.be.server.domain.coupon.application.CouponIssue;
 import kr.hhplus.be.server.domain.coupon.application.service.CouponService;
+import kr.hhplus.be.server.domain.order.adapter.event.OrderCompletedEvent;
 import kr.hhplus.be.server.domain.order.application.Order;
 import kr.hhplus.be.server.common.exception.order.AlreadyProcessedOrderException;
 import kr.hhplus.be.server.domain.order.controller.dto.OrderCreateRequest;
@@ -22,6 +23,7 @@ import kr.hhplus.be.server.domain.user.application.Users;
 import kr.hhplus.be.server.domain.user.application.service.UserService;
 import kr.hhplus.be.server.common.exception.user.InsufficientBalanceException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +40,7 @@ public class OrderFacade {
     private final OrderMapper orderMapper;
     private final InventoryFacade inventoryFacade;
 
-    private final TopProductCacheRepository productCacheRepo;
+    private final ApplicationEventPublisher eventPublisher;;
 
     @Transactional
     public OrderCreateResponse createOrder(OrderCreateRequest req) {
@@ -120,12 +122,14 @@ public class OrderFacade {
                     order.getOrderCode()
             );
 
-            // 주문 수량 캐시 반영
-            productCacheRepo.increaseTodayRankScores(
-                    order.getOrderDt().toLocalDate(),
-                    order.getOrderLines().stream().map(
-                            ord -> new ProductRankingDto.ProductItemForRank(ord.getProductLineId(), ord.getQuantity())
-                    ).toList()
+            // 주문 수량 캐시 반영 이벤트
+            eventPublisher.publishEvent(
+                    new OrderCompletedEvent(
+                            order.getOrderDt().toLocalDate(),
+                            order.getOrderLines().stream().map(
+                                    ord -> new ProductRankingDto.ProductItemForRank(ord.getProductLineId(), ord.getQuantity())
+                            ).toList()
+                    )
             );
 
             // 3. 주문 상태 변경
