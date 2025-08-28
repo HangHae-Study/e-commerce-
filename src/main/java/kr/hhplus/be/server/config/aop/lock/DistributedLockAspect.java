@@ -91,9 +91,9 @@ public class DistributedLockAspect {
                 ? redisson.getLock(keys.get(0))
                 : new RedissonMultiLock(keys.stream().map(redisson::getLock).toArray(RLock[]::new));
 
-        for(String s : keys){
-            System.out.println("key : " + s);
-        }
+        //for(String s : keys){
+        //    System.out.println("key : " + s);
+        //}
 
         boolean acquired = false;
         try {
