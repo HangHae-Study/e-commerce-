@@ -44,12 +44,10 @@ public class OrderSaga {
             transition(OrderState.STARTED);
 
             // 1. 재고 주문 요청 수량 만큼 감소된 아이템들
-            // RestoreOutOfStockException, OutOfStockException
             transition(OrderState.STOCK_DECREASING);
             inventoryFacade.checkStockWithLock(order, productLineIds);
 
             // 2. 유저 포인트 차감
-            // InsufficientBalanceException
             transition(OrderState.POINT_DECREASING);
             Users used = userService.payPointWithLock(
                     order.getUserId(),
@@ -58,7 +56,6 @@ public class OrderSaga {
             );
 
             // 3. 주문 상태 변경
-            // AlreadyProcessedOrderException
             transition(OrderState.PROCESSING);
             return orderService.orderComplete(order);
 
