@@ -51,7 +51,8 @@ CREATE TABLE orders (
                         total_price DECIMAL(12,2),
                         order_dt DATETIME DEFAULT CURRENT_TIMESTAMP,
                         status VARCHAR(255) NOT NULL,
-                        update_dt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                        update_dt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                        version BIGINT NOT NULL DEFAULT 0
     -- no FK(user_id)
 );
 
@@ -66,8 +67,10 @@ CREATE TABLE order_lines (
                              coupon_code VARCHAR(255),
                              dis_count_price DECIMAL(12,2),
                              status VARCHAR(255) NOT NULL,
+                             order_yymmdd DATE,
                              order_dt DATETIME DEFAULT CURRENT_TIMESTAMP,
                              update_dt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                             version BIGINT NOT NULL DEFAULT 0,
 
                              FOREIGN KEY (order_id) REFERENCES orders(order_id)
 );

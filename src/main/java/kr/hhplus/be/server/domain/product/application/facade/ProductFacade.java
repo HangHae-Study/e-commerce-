@@ -7,15 +7,16 @@ import kr.hhplus.be.server.domain.product.application.Product;
 import kr.hhplus.be.server.domain.product.application.ProductLine;
 import kr.hhplus.be.server.domain.product.application.service.ProductLineService;
 import kr.hhplus.be.server.domain.product.application.service.ProductService;
+import kr.hhplus.be.server.domain.product.command.ProductRankingDto;
 import kr.hhplus.be.server.domain.product.controller.dto.ProductDetailResponse;
 import kr.hhplus.be.server.domain.product.controller.dto.ProductListResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -66,39 +67,58 @@ public class ProductFacade {
         );
     }
 
-    public List<ProductLine> getTopProductItems(LocalDate start, LocalDate end){
-        //LocalDate today = LocalDate.now();
-        //LocalDate start = today.minusDays(3); // 오늘부터 -3일전
-        //LocalDate end = today.minusDays(1); // 어제
+    public List<ProductLine> getTopFiveProductForThreeDays(){
+        LocalDate today = LocalDate.now();
+        LocalDate start = today.minusDays(3); // 오늘부터 -3일전
+        LocalDate end = today.minusDays(1); // 어제
+        return getTopProductItems(start, end);
+    }
 
+
+    public List<ProductLine> getTopProductItems(LocalDate start, LocalDate end){
         try{
-            List<ProductLine> cached = productCacheRepo.find(start, end);
+            List<ProductLine> cached = productCacheRepo.findTop5RankFor3Days(start, end);
             if (cached != null) {
                 return cached;
             }else{
-                throw new NoSuchElementException("주문 상위 상품 Cache Miss.");
+                //캐시 스탬피드 방지 락
+                if(productCacheRepo.getLockForTop5RankFor3Days(start, end)){
+                    List<ProductRankingDto.ProductRankEntry> ranks = productCacheRepo.topFiveForThreeDaysZset();
+
+                    // rank가 null 이라면, 주문 정보 기준 DB 조회 후 Cache 만들어주기
+                    if(ranks == null || ranks.isEmpty()){
+                        List<TopOrderProductCommand.TopOrderProductResponse> topPlList = orderService.getTopOrderProduct(start, end);
+
+                        List<ProductLine> topProductLines = topPlList.stream().map(
+                                v -> productLineService.getProductLine(v.getProductLineId())
+                        ).toList();
+
+                        productCacheRepo.refreshThreeDaysZsetFromDb(start, end, topPlList);
+                        productCacheRepo.saveTop5RankFor3Days(start, end, topProductLines);
+
+                        return topProductLines;
+                    }
+                    // rank가 null이 아니라면, 상품 정보 기준 DB 조회 후 상품 Cache 만들어 주기
+                    else{
+                        List<ProductLine> topProductLines = ranks.stream().map(
+                                rank -> productLineService.getProductLine(rank.productLineId())
+                        ).toList();
+
+                        productCacheRepo.saveTop5RankFor3Days(start, end, topProductLines);
+
+                        return topProductLines;
+                    }
+                }else{
+                    throw new NoSuchElementException("주문 상위 상품 Cache Miss.");
+                }
             }
         }catch (Exception e){
-            //throw e;
+            try { Thread.sleep(50); } catch (InterruptedException ignored) {}
+            List<ProductLine> warmed = productCacheRepo.findTop5RankFor3Days(start, end);
+            if (warmed != null) return warmed;
 
-            List<TopOrderProductCommand.TopOrderProductResponse> topPlList = orderService.getTopOrderProduct(start, end);
-
-            List<ProductLine> topProductLines = topPlList.stream().map(
-                    v -> {
-                        return productLineService.getProductLine(v.getProductLineId());
-                    }
-            ).toList();
-
-            productCacheRepo.save(start, end, topProductLines, ttlUntilMidnight());
-
-            return topProductLines;
+            throw e;
         }
-    }
-
-    private Duration ttlUntilMidnight() {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime midnight = now.toLocalDate().plusDays(1).atStartOfDay();
-        return Duration.between(now, midnight);
     }
 
 }

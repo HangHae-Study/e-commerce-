@@ -10,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,6 +40,6 @@ public class JpaNoIndexIntegrationTest {
         // 순위: pl3(6), pl2(3), pl1(3) → LIMIT5 이므로 세 개 모두 나옴
         assertThat(list).hasSize(3);
         assertThat(list.get(0).getProductLineId()).isEqualTo(3L);
-        assertThat(list.get(0).getTotalQuantity()).isEqualTo(6L);
+        assertThat(list.get(0).getOrderQuantity()).isEqualTo(6L);
     }
 }

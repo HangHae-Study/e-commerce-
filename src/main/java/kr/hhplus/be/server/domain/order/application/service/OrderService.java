@@ -1,6 +1,5 @@
 package kr.hhplus.be.server.domain.order.application.service;
 
-import kr.hhplus.be.server.domain.order.adapter.projection.BestSellingProductLineProjection;
 import kr.hhplus.be.server.domain.order.application.Order;
 import kr.hhplus.be.server.domain.order.application.OrderLine;
 import kr.hhplus.be.server.domain.order.application.repository.OrderLineRepository;
@@ -64,7 +63,7 @@ public class OrderService {
                 .stream().map(
                         v -> {
                             return new TopOrderProductCommand.TopOrderProductResponse(
-                                v.getProductLineId(), v.getTotalQuantity()
+                                v.getProductLineId(), v.getOrderQuantity()
                             );
                         }).toList();
     }

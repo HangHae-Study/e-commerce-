@@ -12,10 +12,12 @@ import kr.hhplus.be.server.domain.order.controller.dto.OrderCreateRequest;
 import kr.hhplus.be.server.domain.order.controller.dto.OrderCreateResponse;
 import kr.hhplus.be.server.domain.order.application.service.OrderService;
 import kr.hhplus.be.server.domain.order.command.mapper.OrderMapper;
+import kr.hhplus.be.server.domain.product.adapter.cache.TopProductCacheRepository;
 import kr.hhplus.be.server.domain.product.application.facade.InventoryFacade;
 import kr.hhplus.be.server.common.exception.product.OutOfStockException;
 import kr.hhplus.be.server.common.exception.product.RestoreOutOfStockException;
 import kr.hhplus.be.server.common.exception.user.AlreadyProcessedPointException;
+import kr.hhplus.be.server.domain.product.command.ProductRankingDto;
 import kr.hhplus.be.server.domain.user.application.Users;
 import kr.hhplus.be.server.domain.user.application.service.UserService;
 import kr.hhplus.be.server.common.exception.user.InsufficientBalanceException;
@@ -35,6 +37,8 @@ public class OrderFacade {
     private final UserService userService;
     private final OrderMapper orderMapper;
     private final InventoryFacade inventoryFacade;
+
+    private final TopProductCacheRepository productCacheRepo;
 
     @Transactional
     public OrderCreateResponse createOrder(OrderCreateRequest req) {
@@ -115,6 +119,15 @@ public class OrderFacade {
                     order.getTotalPrice(),
                     order.getOrderCode()
             );
+
+            // 주문 수량 캐시 반영
+            productCacheRepo.increaseTodayRankScores(
+                    order.getOrderDt().toLocalDate(),
+                    order.getOrderLines().stream().map(
+                            ord -> new ProductRankingDto.ProductItemForRank(ord.getProductLineId(), ord.getQuantity())
+                    ).toList()
+            );
+
             // 3. 주문 상태 변경
             // AlreadyProcessedOrderException
             return orderService.orderComplete(order);

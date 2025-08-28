@@ -3,6 +3,7 @@ package kr.hhplus.be.server.config.redis;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -28,6 +29,10 @@ public class RedisConfig {
         mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
         mapper.registerModule(new JavaTimeModule()); // LocalDateTime, LocalDate 지원
         mapper.findAndRegisterModules(); // 다른 모듈도 자동 등록
+        mapper.activateDefaultTyping(
+                LaissezFaireSubTypeValidator.instance,
+                ObjectMapper.DefaultTyping.NON_FINAL
+        );
 
         // Key: String / Value: JSON
         StringRedisSerializer keySerializer = new StringRedisSerializer();
@@ -37,7 +42,6 @@ public class RedisConfig {
         tpl.setHashKeySerializer(keySerializer);
         tpl.setValueSerializer(valueSerializer);
         tpl.setHashValueSerializer(valueSerializer);
-
         tpl.afterPropertiesSet();
         return tpl;
     }

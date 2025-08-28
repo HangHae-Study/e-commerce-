@@ -94,6 +94,8 @@ public class OrderUseCaseInstance {
     public Order orderSavedInFacade(Long orderId, Order ord){
         return Order.builder()
                 .orderId(orderId)
+                .orderLines(ord.getOrderLines())
+                .orderDt(LocalDateTime.now())
                 .status(ord.getStatus())
                 .build();
     }

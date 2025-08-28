@@ -23,12 +23,12 @@ public interface OrderLineJpaRepository extends JpaRepository<OrderLineJpaEntity
     @Query(value = """
         SELECT
           ol.product_line_id   AS productLineId,
-          SUM(ol.quantity)     AS totalQuantity
+          SUM(ol.quantity)     AS orderQuantity
         FROM order_lines ol
         WHERE ol.order_dt BETWEEN :start AND :end
           AND ol.status = 'O_CMPL'
         GROUP BY ol.product_line_id
-        ORDER BY totalQuantity DESC
+        ORDER BY orderQuantity DESC
         LIMIT 5
         """,
             nativeQuery = true)
