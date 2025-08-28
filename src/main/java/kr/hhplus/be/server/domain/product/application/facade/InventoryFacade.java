@@ -1,5 +1,9 @@
 package kr.hhplus.be.server.domain.product.application.facade;
 
+import kr.hhplus.be.server.config.aop.lock.DistributedLock;
+import kr.hhplus.be.server.config.aop.lock.LockType;
+import kr.hhplus.be.server.config.aop.lock.Resource;
+import kr.hhplus.be.server.config.aop.lock.ResourceKey;
 import kr.hhplus.be.server.domain.order.application.Order;
 import kr.hhplus.be.server.domain.order.application.OrderLine;
 import kr.hhplus.be.server.domain.product.application.ProductLine;
@@ -38,8 +42,43 @@ public class InventoryFacade {
         }
     }
 
+    @DistributedLock(
+            type = LockType.STOCK,
+            keys = @ResourceKey(resource = Resource.STOCK, key = "#productLineId")
+    )
+    @Transactional
+    public void checkStockWithLock(Order order, List<Long> productLineId) {
+        List<OrderLine> succeededStockLines = new ArrayList<>();
+        try{
+            order.getOrderLines().forEach(line -> {
+                ProductLine pl = productLineService.getProductLine(line.getProductLineId());
+
+                pl.decreaseStock((long) line.getQuantity());  // domain 메서드 안에서 부족하면 OutOfStockeException
+                productLineService.updateProductLine(pl);
+
+                succeededStockLines.add(line); // 복구 로직 책임
+            });
+        }catch(OutOfStockException outEx) {
+            // 복구 로직 - 5개중 4개만 업데이트 되었다면, 4개만 되돌리기?
+            throw new RestoreOutOfStockException("재고 감소에 실패하였습니다.", succeededStockLines);
+        }
+    }
+
     @Transactional
     public void restoreStock(Order order) {
+        order.getOrderLines().forEach(line -> {
+            ProductLine pl = productLineService.getProductLine(line.getProductLineId());
+            pl.increaseStock((long) line.getQuantity());
+            productLineService.updateProductLine(pl);
+        });
+    }
+
+    @DistributedLock(
+            type = LockType.STOCK,
+            keys = @ResourceKey(resource = Resource.STOCK, key = "#productLineId")
+    )
+    @Transactional
+    public void restoreStockWithLock(Order order, List<Long> productLineId) {
         order.getOrderLines().forEach(line -> {
             ProductLine pl = productLineService.getProductLine(line.getProductLineId());
             pl.increaseStock((long) line.getQuantity());

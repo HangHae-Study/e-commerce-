@@ -9,6 +9,7 @@ import kr.hhplus.be.server.domain.coupon.application.service.CouponService;
 import kr.hhplus.be.server.domain.order.adapter.event.OrderCompletedEvent;
 import kr.hhplus.be.server.domain.order.application.Order;
 import kr.hhplus.be.server.common.exception.order.AlreadyProcessedOrderException;
+import kr.hhplus.be.server.domain.order.application.saga.OrderSaga;
 import kr.hhplus.be.server.domain.order.controller.dto.OrderCreateRequest;
 import kr.hhplus.be.server.domain.order.controller.dto.OrderCreateResponse;
 import kr.hhplus.be.server.domain.order.application.service.OrderService;
@@ -87,6 +88,29 @@ public class OrderFacade {
         catch(ObjectOptimisticLockingFailureException ex){
             throw new AlreadyProcessedOrderException(order.getOrderId(), order.getOrderCode());
         }
+    }
+
+    @DistributedLock(
+            type = LockType.ORDER,
+            keys = @ResourceKey(resource = Resource.ORDER, key = "#order.orderId")
+    )
+    public Order orderCompleteWithDistributedTransaction(
+            Order order, List<Long> productLineId
+    ){
+        try{
+            OrderSaga orderSaga = new OrderSaga(
+                    order,
+                    productLineId,
+                    inventoryFacade,
+                    userService,
+                    orderService
+            );
+
+            return orderSaga.start();
+        }catch (Exception ex){
+            throw ex;
+        }
+
     }
 
     @DistributedLock(
