@@ -37,6 +37,10 @@ public class Order extends VersionedDomain {
         setStatus("O_FAIL");
     }
 
+    public void isPending(){
+        if(!"O_MAKE".equals(status)) throw new AlreadyProcessedOrderException(orderId, orderCode);
+    }
+
     public boolean isWaitedOrder(){
         return "O_MAKE".equals(status);
     }
