@@ -21,9 +21,6 @@ public class OrderEventHandler {
                 event.orderDate(),
                 event.items()
         );
-
-        // todo
-        // apiClient.sendData();
     }
 
 }
