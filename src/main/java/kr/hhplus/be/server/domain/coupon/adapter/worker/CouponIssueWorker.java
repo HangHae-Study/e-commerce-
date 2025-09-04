@@ -27,16 +27,31 @@ public class CouponIssueWorker {
     private final CouponIssuedCacheRepository issuedCacheRepository;
     private final DefaultCouponCodeGenerator codeGenerator;
 
+    public void processCouponIssue(Long userId, Long couponId){
+        // Redis에서 원자적 차감
+        Long stock = couponCacheRepository.tryConsumeStock(couponId);
+        if (stock < 0L) {
+            // 잔여 수량 없음 → 실패 처리
+            issuedCacheRepository.finalizeClaimStatus(
+                    couponId, userId, Duration.ofMinutes(5), null
+            );
+            log.warn("쿠폰 [{}] - 사용자 [{}] 발급 실패 (재고 부족)", couponId, userId);
+            return;
+        }
+
+
+    }
+
     /**
      * 매 1초마다 쿠폰 발급 워커 실행
      * (cron 표현식: 초 분 시 일 월 요일)
      * "0/1 * * * * *" → 매초 실행
      */
-    @Scheduled(cron = "0/1 * * * * *")
+    //@Scheduled(cron = "0/1 * * * * *")
     public void processCouponIssueQueue(Long couponId) {
         // 발급 대기열에서 최대 1명 꺼내기
         List<String> userIds = queue.popOldestMembers(couponId, 1L);
-        if (userIds.isEmpty()) {
+        if (userIds == null || userIds.isEmpty()) {
             return;
         }
 

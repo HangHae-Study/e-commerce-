@@ -8,6 +8,7 @@ import kr.hhplus.be.server.domain.coupon.adapter.cache.CouponCacheKeyProvider;
 import kr.hhplus.be.server.domain.coupon.adapter.cache.CouponCacheQueue;
 import kr.hhplus.be.server.domain.coupon.adapter.cache.CouponCacheRepository;
 import kr.hhplus.be.server.domain.coupon.adapter.cache.CouponIssuedCacheRepository;
+import kr.hhplus.be.server.domain.coupon.adapter.event.CouponIssuedEvent;
 import kr.hhplus.be.server.domain.coupon.application.Coupon;
 import kr.hhplus.be.server.domain.coupon.application.CouponIssue;
 import kr.hhplus.be.server.common.exception.coupon.InvalidCouponException;
@@ -16,15 +17,14 @@ import kr.hhplus.be.server.domain.coupon.application.repository.CouponIssueRepos
 import kr.hhplus.be.server.domain.coupon.application.repository.CouponRepository;
 import kr.hhplus.be.server.domain.coupon.controller.dto.CouponClaimCommand;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static kr.hhplus.be.server.domain.coupon.adapter.cache.CouponCacheKeyProvider.CouponClaimStatus.*;
 
@@ -38,6 +38,8 @@ public class CouponService {
     private final CouponCacheRepository couponCacheRepository;
     private final CouponIssuedCacheRepository couponIssuedCacheRepository;
     private final CouponCacheQueue couponCacheQueue;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     public List<Coupon> getValidCoupons(){
         return couponRepository.findValidCouponList(LocalDateTime.now(), 0L);
@@ -81,13 +83,17 @@ public class CouponService {
 
             Long remains = couponCacheRepository.getRemainingStock(couponId);
             if(remains <= 0){
-                throw new InvalidCouponException("FAILED TO ISSUE COUPON");
+                throw new InvalidCouponException("FAILED TO ISSUE COUPON1");
             }
 
             boolean issued = couponCacheQueue.enqueueClaim(couponId, userId);
             if(issued){
                 // 발급 요청이 정상적으로 진행되었습니다.
                 response = CouponClaimCommand.init(couponId, userId);
+                eventPublisher.publishEvent(CouponIssuedEvent.of(
+                        couponId,
+                        userId
+                ));
             }else{
                 throw new InvalidCouponException("FAILED TO ISSUE COUPON");
             }
@@ -105,6 +111,20 @@ public class CouponService {
         Coupon coupon = //couponRepository.findByIdWithPessimisticLock(couponId)
                 couponRepository.findById(couponId)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 쿠폰입니다."));
+
+        String code = codeGenerator.generate(coupon, coupon.getCouponId(), coupon.getRemaining());
+        CouponIssue issue = coupon.issueTo(userId, code);
+
+        // 변경된 coupon, 발급된 issue 둘 다 저장
+        couponRepository.save(coupon);
+        return couponIssueRepository.save(issue);
+    }
+
+    @Transactional
+    public CouponIssue newCouponIssueWithOutDistLock(Long userId, Long couponId) {
+        Coupon coupon = //couponRepository.findByIdWithPessimisticLock(couponId)
+                couponRepository.findById(couponId)
+                        .orElseThrow(() -> new NoSuchElementException("존재하지 않는 쿠폰입니다. newCouponIssueWithOutDistLock"));
 
         String code = codeGenerator.generate(coupon, coupon.getCouponId(), coupon.getRemaining());
         CouponIssue issue = coupon.issueTo(userId, code);
