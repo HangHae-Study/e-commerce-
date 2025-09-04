@@ -29,7 +29,7 @@ public class PaymentFacade {
                     OrderLine::getProductLineId
             ).toList();
 
-            order = orderFacade.orderCompleteWithDistributedTransaction(order, plIdList);
+            order = orderFacade.orderComplete(order, plIdList);
 
             // 4. 결제 정보 생성
             return PaymentCreateCommand.response(paymentService.pay(

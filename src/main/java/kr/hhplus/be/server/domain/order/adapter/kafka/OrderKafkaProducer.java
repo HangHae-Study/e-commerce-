@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.kafka;
+package kr.hhplus.be.server.domain.order.adapter.kafka;
 
 import kr.hhplus.be.server.domain.order.adapter.entity.outbox.OutboxMessage;
 import kr.hhplus.be.server.domain.order.adapter.repository.outbox.OutboxJpaRepository;
@@ -29,9 +29,4 @@ public class OrderKafkaProducer {
             }
         }
     }
-
-    // 정면 네모, 위에는 동그라미, 옆에 서는 세모
-
-
-
 }

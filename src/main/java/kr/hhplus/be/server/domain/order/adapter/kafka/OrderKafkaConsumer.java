@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.kafka;
+package kr.hhplus.be.server.domain.order.adapter.kafka;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,7 +19,11 @@ public class OrderKafkaConsumer {
     private final ObjectMapper om;
     private final OutboxJpaRepository outboxRepository;
 
-    @KafkaListener(topics = "order.events.v1", groupId = "order-service")
+    @KafkaListener(
+            topics = "order.events.v1",
+            groupId = "order-service" ,
+            containerFactory = "orderKafkaListenerFactory"
+    )
     @Transactional
     public void onOrderComplete(JsonNode o, Acknowledgment ack){
         try{

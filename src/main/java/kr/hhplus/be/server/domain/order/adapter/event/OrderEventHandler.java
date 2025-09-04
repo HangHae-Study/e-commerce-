@@ -1,16 +1,13 @@
 package kr.hhplus.be.server.domain.order.adapter.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.hhplus.be.server.config.kafka.OrderKafkaPublisher;
+import kr.hhplus.be.server.domain.order.adapter.kafka.OrderKafkaPublisher;
 import kr.hhplus.be.server.domain.order.adapter.entity.outbox.OutboxMessage;
 import kr.hhplus.be.server.domain.order.adapter.repository.outbox.OutboxJpaRepository;
 import kr.hhplus.be.server.domain.product.adapter.cache.TopProductCacheRepository;
-import kr.hhplus.be.server.domain.product.command.ProductRankingDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 

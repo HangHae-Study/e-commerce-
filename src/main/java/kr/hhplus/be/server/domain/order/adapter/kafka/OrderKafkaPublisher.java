@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.kafka;
+package kr.hhplus.be.server.domain.order.adapter.kafka;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
