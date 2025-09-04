@@ -37,14 +37,14 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
     consumer:
-      group-id: order-service   # 결제 결과를 받는 컨슈머
+      #group-id: order-service   # 결제 결과를 받는 컨슈머
       enable-auto-commit: false
       auto-offset-reset: latest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
-        spring.json.value.default.type: "kr.hhplus.be.server.domain.order.adapter.event.OrderCompletedEvent"
+      #  spring.json.value.default.type: "kr.hhplus.be.server.domain.order.adapter.event.OrderCompletedEvent"
 
     listener:
       ack-mode: manual          # 수동 커밋(정확한 처리/재시도 제어)

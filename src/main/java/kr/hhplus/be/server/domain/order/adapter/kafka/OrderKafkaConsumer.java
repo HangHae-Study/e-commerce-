@@ -36,7 +36,7 @@ public class OrderKafkaConsumer {
 
             ack.acknowledge();
         }catch(Exception e){
-
+            System.out.println("컨슈머 에러: " + e);
         }
     }
 }
