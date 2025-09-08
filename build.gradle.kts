@@ -70,7 +70,14 @@ dependencies {
 	// redis
 	implementation ("org.redisson:redisson-spring-boot-starter:3.27.2")
 
+	// query performance check
 	testImplementation("net.ttddyy:datasource-proxy:1.9")
+
+	// kafka
+	implementation("org.springframework.kafka:spring-kafka")
+	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+	testImplementation("org.springframework.kafka:spring-kafka-test") // @EmbeddedKafka 등
+
 
 }
 

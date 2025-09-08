@@ -20,6 +20,92 @@ services:
     volumes:
       - ~/Projects/data/redis:/data
 
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.1
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      # 클라이언트 접속 포트(브로커가 여기에 붙음)
+      ZOOKEEPER_CLIENT_PORT: 2181
+      # ZK 내부 타임 유닛(ms). 세션/심박 주기의 기준.
+      ZOOKEEPER_TICK_TIME: 2000
+      # Zookeeper 초기화를 위한 제한 시간을 설정
+      ZOOKEEPER_INIT_LIMIT: 5
+      # Zookeeper 리더와 나머지 서버들 간의 싱크 타임아웃 시간 설정 옵션
+      ZOOKEEPER_SYNC_LIMIT: 2
+      #화이트리스트
+      KAFKA_OPTS: "-Dzookeeper.4lw.commands.whitelist=ruok,stat,mntr,conf,isro,srvr"
+    healthcheck:
+      test: ["CMD-SHELL", "echo ruok | nc -w 1 localhost 2181 | grep -q imok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: kafka
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    ports:
+      # 호스트에서 접속용(EXTERNAL)
+      - "9094:9094"
+      # (선택) 내부용(컨테이너 간) 포트도 매핑해두면 디버깅 편함
+      - "9092:9092"
+    environment:
+      # 브로커 고유 ID (클러스터 내 유일)
+      KAFKA_BROKER_ID: 1
+
+      # ZooKeeper 접속 정보(브로커가 메타데이터 등록/조회)
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+
+      # 리스너 이름 ↔ 보안 프로토콜 매핑 (둘 다 평문)
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+
+      # 브로커가 실제 바인딩할 주소:포트 (이름은 위 매핑의 키여야 함)
+      # - INTERNAL: 컨테이너 네트워크 내 접근(kafka-ui 등)
+      # - EXTERNAL: 호스트 OS에서 접근(내 PC/로컬 IDE)
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:9094
+
+      # 클라이언트에게 "이 주소로 붙어"라고 광고하는 주소 (매우 중요)
+      # - 컨테이너들은 kafka:9092 로
+      # - 호스트는 localhost:9094 로
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://localhost:9094
+
+      # 브로커-브로커 내부 통신은 어떤 리스너를 쓸지 지정
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+
+      # 단일 브로커이므로 복제/ISR 1로 (운영 다중 브로커는 3 권장)
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+
+      # 개발 편의: 자동 토픽 생성, 기본 파티션 수
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_NUM_PARTITIONS: 3
+
+      # 컨슈머 그룹 초기 리밸런스 지연(개발 편의로 0)
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+
+    healthcheck:
+      test: [ "CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list >/dev/null 2>&1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8090:8080"
+    environment:
+      # 컨테이너 네트워크 내부 주소로 붙는다(INTERNAL 리스너)
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    depends_on:
+      kafka:
+        condition: service_healthy
 networks:
   default:
     driver: bridge

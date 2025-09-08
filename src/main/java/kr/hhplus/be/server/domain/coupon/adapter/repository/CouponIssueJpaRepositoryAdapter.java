@@ -51,4 +51,11 @@ public class CouponIssueJpaRepositoryAdapter implements CouponIssueRepository {
         //couponIssueJpaRepository.findCouponIssueJpaEntitiesByCouponCode(code).map(CouponIssueJpaEntity::toDomain);
 
     }
+
+    @Override
+    public List<CouponIssue> findByCouponId(Long couponId) {
+        return couponIssueJpaRepository.findCouponIssueJpaEntitiesByCouponId(couponId)
+                .stream().map(CouponIssueJpaEntity::toDomain)
+                .toList();
+    }
 }

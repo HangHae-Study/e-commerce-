@@ -147,14 +147,7 @@ public class OrderFacade {
             );
 
             // 주문 수량 캐시 반영 이벤트
-            eventPublisher.publishEvent(
-                    new OrderCompletedEvent(
-                            order.getOrderDt().toLocalDate(),
-                            order.getOrderLines().stream().map(
-                                    ord -> new ProductRankingDto.ProductItemForRank(ord.getProductLineId(), ord.getQuantity())
-                            ).toList()
-                    )
-            );
+            eventPublisher.publishEvent(new OrderCompletedEvent(order));
 
             // 3. 주문 상태 변경
             // AlreadyProcessedOrderException

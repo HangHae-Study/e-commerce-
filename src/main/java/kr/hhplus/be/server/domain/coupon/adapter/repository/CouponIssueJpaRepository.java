@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -19,4 +20,6 @@ public interface CouponIssueJpaRepository extends JpaRepository<CouponIssueJpaEn
     @Lock(LockModeType.OPTIMISTIC)
     @Query("SELECT c FROM CouponIssueJpaEntity c WHERE c.couponCode = :code")
     Optional<CouponIssueJpaEntity> findByCouponCodeWithLock(@Param("code") String code);
+
+    List<CouponIssueJpaEntity> findCouponIssueJpaEntitiesByCouponId(@Param("couponId") Long couponId);
 }
