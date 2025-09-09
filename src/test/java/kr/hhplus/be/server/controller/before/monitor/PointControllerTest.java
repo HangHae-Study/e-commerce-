@@ -28,6 +28,7 @@ import java.util.ArrayList;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -77,12 +78,11 @@ public class PointControllerTest {
     @Nested
     @DisplayName("유저 컨트롤러 테스트")
     class UserPointEndPointTest{
-
-
         @Test
         @DisplayName("GET /points/{userId} - 잔액 조회 성공")
         void getBalance_success() throws Exception {
             mvc.perform(get("/points/{userId}", 1L))
+                    .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andExpect(jsonPath("$.code").value("SUCCESS"))
@@ -94,6 +94,7 @@ public class PointControllerTest {
         @DisplayName("GET /points/{userId}/reqId - 요청 아이디 생성 성공(형식 검증)")
         void getReqId_success() throws Exception {
             mvc.perform(get("/points/{userId}/reqId", 1L))
+                    .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.code").value("SUCCESS"))
                     .andExpect(jsonPath("$.data").exists())
@@ -110,6 +111,7 @@ public class PointControllerTest {
             mvc.perform(patch("/points/{userId}", 1L)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(body))
+                    .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.code").value("SUCCESS"))
                     .andExpect(jsonPath("$.data.userId").value(1L))

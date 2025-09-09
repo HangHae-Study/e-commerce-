@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.domain.product.controller;
 
 import kr.hhplus.be.server.common.api.ApiResponse;
+import kr.hhplus.be.server.domain.product.application.ProductLine;
 import kr.hhplus.be.server.domain.product.application.facade.ProductFacade;
 import kr.hhplus.be.server.domain.product.controller.dto.*;
 import lombok.RequiredArgsConstructor;
@@ -29,14 +30,13 @@ public class ProductController {
     @GetMapping("/top")
     public ResponseEntity<ApiResponse<TopProductsResponse>> topProducts(
             @RequestParam(name = "limit", defaultValue = "5") int limit) {
-        List<TopProductRanking> rankings = List.of(
-                new TopProductRanking(1L, "인기 1순위 상품", 100.0, 100),
-                new TopProductRanking(2L, "인기 2순위 상품", 80.0, 80),
-                new TopProductRanking(3L, "인기 3순위 상품", 60.0, 60),
-                new TopProductRanking(4L, "인기 4순위 상품", 40.0, 40),
-                new TopProductRanking(5L, "인기 5순위 상품", 20.0, 20)
-        );
-        List<TopProductRanking> topN = rankings.stream().limit(limit).toList();
+
+        List<ProductLine> topProducts = productFacade.getTopFiveProductForThreeDays();
+
+        List<TopProductRanking> topN = topProducts.stream().map(
+                a -> new TopProductRanking(a.getProductLineId(), a.getProductLineName(), a.getProductLinePrice(), a.getRemaining())
+        ).toList();
+
         return ResponseEntity.ok(ApiResponse.success(new TopProductsResponse(topN)));
     }
 }
