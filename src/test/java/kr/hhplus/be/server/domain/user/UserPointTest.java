@@ -239,7 +239,7 @@ public class UserPointTest
 
         @Test
         void 유저_잔액_충전_성공() throws Exception {
-            BalanceChargeRequest request = new BalanceChargeRequest(new BigDecimal(500));
+            BalanceChargeRequest request = new BalanceChargeRequest(new BigDecimal(500), "");
 
             mockMvc.perform(patch("/points/{userId}", 1L)
                             .contentType(MediaType.APPLICATION_JSON)

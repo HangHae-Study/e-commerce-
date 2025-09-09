@@ -12,7 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 
 @RestController
 @RequestMapping("/points")
@@ -22,7 +23,7 @@ public class PointController {
     private final UserService userService;
 
     @GetMapping("/{userId}")
-    public ResponseEntity<ApiResponse<BalanceInquiryResponse>> getBalance(@PathVariable Long userId) {
+    public ResponseEntity<ApiResponse<BalanceInquiryResponse>> getBalance(@PathVariable("userId") Long userId) {
 
         PointDao point = userService.getPoint(userId);
 
@@ -31,12 +32,22 @@ public class PointController {
         return ResponseEntity.ok(ApiResponse.success(data));
     }
 
+    @GetMapping("/{userId}/reqId")
+    public ResponseEntity<ApiResponse<String>> getReqId(
+            @PathVariable("userId") Long userId
+    ){
+        LocalDateTime now = LocalDateTime.now();
+        String reqId = userId + "_" + now + "_" + "CHARGE";
+
+        return ResponseEntity.ok(ApiResponse.success(reqId));
+    }
+
     @PatchMapping("/{userId}")
     public ResponseEntity<ApiResponse<BalanceChargeResponse>> charge(
-            @PathVariable Long userId,
+            @PathVariable("userId") Long userId,
             @Valid @RequestBody BalanceChargeRequest req) {
 
-        Users user = userService.chargePoint(userId, req.amount());
+        Users user = userService.chargePointWithLock(userId, req.amount(), req.reqId());
 
         BalanceChargeResponse data = new BalanceChargeResponse(user.getUserId(), user.getBalance());
 

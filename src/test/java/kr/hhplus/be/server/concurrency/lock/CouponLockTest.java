@@ -138,6 +138,8 @@ public class CouponLockTest {
             // coupon_issue 테이블에 100건 발급
             List<CouponIssue> issues = couponIssueRepository.findAll();
             assertThat(issues).hasSize(100);
+
+
         }
 
     }
