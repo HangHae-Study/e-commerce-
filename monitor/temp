@@ -1,0 +1,9 @@
+ docker run --rm -i \
+  -v ~/Projects/monitor/:/scripts \
+  grafana/k6 run \
+  --out influxdb=http://root:root@host.docker.internal:8086/k6 \
+  /scripts/k6_test.js
+
+
+  # docker exec -it docker-influxdb-grafana influx -username root -password root
+# CREATE DATABASE k6
