@@ -189,5 +189,13 @@ public class OrderFacade {
         }
     }
 
+    public OrderCreateResponse getOrder(Long orderId){
+        try{
+            return orderMapper.toResponse(orderService.getOrder(orderId));
+        }catch (Exception ex){
+            throw ex;
+        }
+    }
+
 
 }
