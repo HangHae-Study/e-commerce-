@@ -156,7 +156,7 @@ public class UserPointTest
             when(userRepository.save(any())).thenReturn(user);
 
             // when
-            Users result = userService.chargePoint(userId, 500);
+            Users result = userService.chargePoint(userId, 500, "");
 
             // then
             assertThat(result.getBalance()).isEqualByComparingTo("1500");
@@ -169,7 +169,7 @@ public class UserPointTest
             Long userId = 999L;
             when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> userService.chargePoint(userId, 500))
+            assertThatThrownBy(() -> userService.chargePoint(userId, 500, ""))
                     .isInstanceOf(NoSuchElementException.class)
                     .hasMessageContaining("존재하지 않는 유저");
         }
@@ -192,7 +192,7 @@ public class UserPointTest
             when(userRepository.findById(1L)).thenReturn(Optional.of(user));
             when(pointRepository.findByUserId(1L)).thenReturn(Optional.of(pointDao));
 
-            assertThatThrownBy(() -> userService.chargePoint(1L, -999))
+            assertThatThrownBy(() -> userService.chargePoint(1L, -999, ""))
                     .isInstanceOf(IllegalArgumentException.class);
 
             verify(userRepository, never()).save(any());

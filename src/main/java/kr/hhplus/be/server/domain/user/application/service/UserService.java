@@ -40,10 +40,9 @@ public class UserService {
          return user;
     }
 
-    @Transactional
     public PointDao getPoint(Long userId){
-        PointDao pointDao = pointRepository.findByUserId(userId)
-                //pointRepository.findByIdWithPessimisticLock(userId)
+        PointDao pointDao = //pointRepository.findByUserId(userId)
+                pointRepository.findByIdWithPessimisticLock(userId)
                 .orElseGet(() -> {
                     PointDao newP = PointDao.builder()
                             .userId(userId)
@@ -58,18 +57,22 @@ public class UserService {
     }
 
     @Transactional
-    public Users chargePoint(Long userId, Object amount){
+    public Users chargePoint(Long userId, Object amount, String reqId){
         PointDao point = getPoint(userId);
-        // more : 포인트 레포 적용 코드
-
+        PointRecordDao records = recordOfCharge(point, new BigDecimal(amount.toString()), reqId);
         Users user = getUser(userId);
-        user.pointCharge(amount);
-        userRepository.save(user);
 
-        point.setBalance(user.getBalance());
-        pointRepository.save(point);
+        try{
+            user.pointCharge(amount);
+            userRepository.save(user);
 
-        return user;
+            point.setBalance(user.getBalance());
+            pointRepository.save(point);
+            pointRecordRepository.save(records);
+            return user;
+        }catch(Exception ex){
+            throw ex;
+        }
     }
 
 
