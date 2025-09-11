@@ -71,7 +71,17 @@ public class ProductFacade {
         LocalDate today = LocalDate.now();
         LocalDate start = today.minusDays(3); // 오늘부터 -3일전
         LocalDate end = today.minusDays(1); // 어제
-        return getTopProductItems(start, end);
+        return getTopProductItemsWihtOutCache(start, end);
+    }
+
+    public List<ProductLine> getTopProductItemsWihtOutCache(LocalDate start, LocalDate end){
+        List<TopOrderProductCommand.TopOrderProductResponse> topPlList = orderService.getTopOrderProduct(start, end);
+
+        List<ProductLine> topProductLines = topPlList.stream().map(
+                v -> productLineService.getProductLine(v.getProductLineId())
+        ).toList();
+
+        return topProductLines;
     }
 
 
