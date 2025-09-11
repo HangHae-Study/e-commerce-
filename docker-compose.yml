@@ -28,7 +28,7 @@ services:
       - "3004:8083"   # InfluxDB Admin UI
       - "8086:8086"   # InfluxDB HTTP API
     volumes:
-      - ~/Projects/influxdb:/var/lib/influxdb
+      #- ~/Projects/influxdb:/var/lib/influxdb
       - ~/Projects/grafana:/var/lib/grafana
     restart: unless-stopped
 

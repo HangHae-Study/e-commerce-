@@ -13,6 +13,10 @@ spring:
       connection-timeout: 10000
       max-lifetime: 60000
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+  sql:
+    init:
+      mode: always
   jpa:
     open-in-view: false
     generate-ddl: false
@@ -57,7 +61,7 @@ logging:
   level:
     org:
       hibernate:
-        SQL: DEBUG
+        SQL: warn # DEBUG
         type:
           descriptor:
             sql:
