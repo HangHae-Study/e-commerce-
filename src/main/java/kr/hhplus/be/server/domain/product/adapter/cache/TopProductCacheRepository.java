@@ -1,5 +1,7 @@
 package kr.hhplus.be.server.domain.product.adapter.cache;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.hhplus.be.server.domain.order.command.TopOrderProductCommand;
 import kr.hhplus.be.server.domain.product.application.ProductLine;
 import kr.hhplus.be.server.domain.product.command.ProductRankingDto;
@@ -20,14 +22,15 @@ import java.util.concurrent.TimeUnit;
 @Repository
 @RequiredArgsConstructor
 public class TopProductCacheRepository {
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, Object> productRedisTemplate;
     private final StringRedisTemplate stringRedisTemplate;
     private final ProductCacheKeyProvider keyProvider;
+    private final ObjectMapper mapper;
 
     private void setExpireIfAbsent(String key, Duration duration){
-        Long ttl = redisTemplate.getExpire(key, TimeUnit.SECONDS);
+        Long ttl = productRedisTemplate.getExpire(key, TimeUnit.SECONDS);
         if(ttl == null || ttl == -1){
-            redisTemplate.expire(key, duration);
+            productRedisTemplate.expire(key, duration);
         }
     }
 
@@ -49,25 +52,25 @@ public class TopProductCacheRepository {
     @SuppressWarnings("unchecked")
     public List<ProductLine> findTop5RankFor3Days(LocalDate start, LocalDate end) {
         String key = keyProvider.threeDaysValueCacheKey(start, end);
-        Object val = redisTemplate.opsForValue().get(key);
+        Object val = productRedisTemplate.opsForValue().get(key);
         if (val == null) return null;
-        return (List<ProductLine>) val;
+        return mapper.convertValue(val, new TypeReference<List<ProductLine>>() {});
     }
 
     public void saveTop5RankFor3Days(LocalDate start, LocalDate end,
                                      List<ProductLine> value) {
         String key = keyProvider.threeDaysValueCacheKey(start, end);
-        redisTemplate.opsForValue().set(key, value, ttlUntilMidnight());
+        productRedisTemplate.opsForValue().set(key, value, ttlUntilMidnight());
     }
 
     public void evict(LocalDate start, LocalDate end) {
-        redisTemplate.delete(keyProvider.threeDaysValueCacheKey(start, end));
+        productRedisTemplate.delete(keyProvider.threeDaysValueCacheKey(start, end));
     }
 
      //1) 주문 성공 시 실시간 ZSET 점수 증가
     public void increaseTodayRankScores(LocalDate day, List<ProductRankingDto.ProductItemForRank> items){
         items.forEach(pl -> {
-            redisTemplate.opsForZSet().incrementScore(
+            productRedisTemplate.opsForZSet().incrementScore(
                     keyProvider.realtimeKey(day),
                     pl.productLineId(),
                     pl.quantity()
