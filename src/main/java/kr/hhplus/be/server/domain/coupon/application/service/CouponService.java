@@ -150,7 +150,7 @@ public class CouponService {
 
     @Transactional
     public CouponIssue couponAppliedByOrder(Long userId, String cCode){
-        if(cCode.isEmpty() || cCode.isBlank()){
+        if(cCode == null || cCode.isEmpty() || cCode.isBlank()){
             return null;
         }
 
