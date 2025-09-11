@@ -41,8 +41,8 @@ public class UserService {
     }
 
     public PointDao getPoint(Long userId){
-        PointDao pointDao = //pointRepository.findByUserId(userId)
-                pointRepository.findByIdWithPessimisticLock(userId)
+        PointDao pointDao = pointRepository.findByUserId(userId)
+                //pointRepository.findByIdWithPessimisticLock(userId)
                 .orElseGet(() -> {
                     PointDao newP = PointDao.builder()
                             .userId(userId)
