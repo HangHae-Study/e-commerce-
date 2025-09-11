@@ -46,6 +46,7 @@ public class OrderJpaRepositoryAdapter implements OrderRepository {
     public Optional<Order> findByOrderCode(String code) {
         //return jpaRepository.findByOrderCode(code).map(OrderJpaEntity::toDomain);
         // step 09 : 낙관적 락으로 변경
-        return jpaRepository.findByOrderCodeWithLock(code).map(OrderJpaEntity::toDomain);
+        //return jpaRepository.findByOrderCodeWithLock(code).map(OrderJpaEntity::toDomain);
+        return jpaRepository.findByOrderCode(code).map(OrderJpaEntity::toDomain);
     }
 }
