@@ -31,5 +31,22 @@ public class OrderController {
 
         return ResponseEntity.ok(ApiResponse.success(response));
     }
+
+    @GetMapping("/{orderId}")
+    public ResponseEntity<ApiResponse<OrderCreateResponse>> getOrder(@PathVariable Long orderId) {
+
+        OrderCreateResponse response = orderFacade.getOrder(orderId);
+
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @GetMapping("/code/{orderCode}")
+    public ResponseEntity<ApiResponse<OrderCreateResponse>> getOrder(@PathVariable String orderCode) {
+
+        OrderCreateResponse response = orderFacade.getOrder(orderCode);
+
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
 }
 

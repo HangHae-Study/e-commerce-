@@ -74,6 +74,16 @@ public class ProductFacade {
         return getTopProductItems(start, end);
     }
 
+    public List<ProductLine> getTopProductItemsWihtOutCache(LocalDate start, LocalDate end){
+        List<TopOrderProductCommand.TopOrderProductResponse> topPlList = orderService.getTopOrderProduct(start, end);
+
+        List<ProductLine> topProductLines = topPlList.stream().map(
+                v -> productLineService.getProductLine(v.getProductLineId())
+        ).toList();
+
+        return topProductLines;
+    }
+
 
     public List<ProductLine> getTopProductItems(LocalDate start, LocalDate end){
         try{

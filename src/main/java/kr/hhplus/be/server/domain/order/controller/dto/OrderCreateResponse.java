@@ -12,7 +12,7 @@ public record OrderCreateResponse(
     ) {
 
     public record OrderResItem(
-            Long productLineId,
+            Long orderLineId,
             BigDecimal linePrice,
             String couponYN,
             BigDecimal discountPrice,

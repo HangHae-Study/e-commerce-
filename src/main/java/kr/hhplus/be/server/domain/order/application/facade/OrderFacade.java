@@ -147,7 +147,7 @@ public class OrderFacade {
             );
 
             // 주문 수량 캐시 반영 이벤트
-            eventPublisher.publishEvent(new OrderCompletedEvent(order));
+            //eventPublisher.publishEvent(new OrderCompletedEvent(order));
 
             // 3. 주문 상태 변경
             // AlreadyProcessedOrderException
@@ -186,6 +186,24 @@ public class OrderFacade {
             throw ex;
         }catch(ObjectOptimisticLockingFailureException ex){
             throw new AlreadyProcessedOrderException(order.getOrderId(), order.getOrderCode());
+        }
+    }
+
+    public OrderCreateResponse getOrder(Long orderId){
+        try{
+            return orderMapper.toResponse(orderService.getOrder(orderId));
+        }catch (Exception ex){
+            throw ex;
+        }
+    }
+
+
+    public OrderCreateResponse getOrder(String orderCode){
+        try{
+            return orderMapper.toResponse(orderService.getOrderByCode(orderCode));
+
+        }catch(Exception ex){
+            throw ex;
         }
     }
 

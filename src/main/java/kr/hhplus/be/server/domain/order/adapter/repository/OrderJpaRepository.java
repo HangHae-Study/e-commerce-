@@ -15,7 +15,8 @@ import java.util.Optional;
 @Repository
 public interface OrderJpaRepository extends JpaRepository<OrderJpaEntity, Long> {
 
-    Optional<OrderJpaEntity> findByOrderCode(String code);
+    @Query("SELECT o FROM OrderJpaEntity o LEFT JOIN FETCH o.orderLines WHERE o.orderCode = :code")
+    Optional<OrderJpaEntity> findByOrderCode(@Param("code")String code);
 
     @Lock(LockModeType.OPTIMISTIC)
     @Query("select o from OrderJpaEntity o where o.orderId = :orderId")

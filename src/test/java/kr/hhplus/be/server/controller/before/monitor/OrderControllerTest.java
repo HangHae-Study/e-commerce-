@@ -196,4 +196,59 @@ public class OrderControllerTest {
                     .andExpect(jsonPath("$.data.totalPrice").value(400)); // 1000 * 2
         }
     }
+
+    @Nested
+    @DisplayName("결제 요청")
+    class OrderWithPayment {
+
+        @Test
+        @DisplayName("POST /payments - 성공")
+        void createOrder_success() throws Exception {
+            Long productId = productJpaRepository.findAll().get(0).getProductId();
+
+            String orderCode = UUID.randomUUID().toString();
+
+            // OrderCreateRequest JSON (예시)
+            String body = """
+                {
+                  "orderCode": "%s",
+                  "userId": 1,
+                  "totalPrice": 400,
+                  "couponCode": "",
+                  "items": [
+                    {
+                      "productLineId": %d,
+                      "linePrice" : 100,
+                      "quantity": 2
+                    }
+                  ]
+                }
+                """.formatted(orderCode, productId);
+
+            mvc.perform(post("/orders")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(body))
+                    .andDo(print())
+                    .andExpect(status().isOk());
+
+            String paymentReq = """
+            { "orderCode": "%s" }
+            """.formatted(orderCode);
+
+            mvc.perform(post("/payments")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(paymentReq))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.paymentId").exists())
+                    .andExpect(jsonPath("$.orderId").exists())
+                    .andExpect(jsonPath("$.totalPrice").value(400)) // 5000 * 2
+                    .andExpect(jsonPath("$.paymentStatus").value("P_CMPL"));
+
+            mvc.perform(get("/orders/1"))
+                    .andDo(print());
+
+
+        }
+    }
 }

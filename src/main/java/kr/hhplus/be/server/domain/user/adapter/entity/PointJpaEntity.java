@@ -39,13 +39,13 @@ public class PointJpaEntity {
     private LocalDateTime updateDt;
 
     public PointDao toDao() {
-        List<PointRecordDao> records = pointRecords.stream().map(PointRecordJpaEntity::toDao).collect(Collectors.toList());
+        //List<PointRecordDao> records = pointRecords.stream().map(PointRecordJpaEntity::toDao).collect(Collectors.toList());
         return PointDao.builder()
                 .pointId(pointId)
                 .userId(userId)
                 .balance(balance)
                 .updateDt(updateDt)
-                .pointRecords(records)
+                //.pointRecords(records)
                 .build();
     }
 
@@ -57,9 +57,9 @@ public class PointJpaEntity {
         e.userId  = domain.getUserId();
         e.balance = domain.getBalance();
         e.updateDt = domain.getUpdateDt();
-        e.pointRecords = domain.getPointRecords().stream().map(
-                record -> PointRecordJpaEntity.fromDao(record, e)
-        ).toList();
+        //e.pointRecords = domain.getPointRecords().stream().map(
+        //        record -> PointRecordJpaEntity.fromDao(record, e)
+        //).toList();
         return e;
     }
 }

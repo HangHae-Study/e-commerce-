@@ -20,6 +20,18 @@ services:
     volumes:
       - ~/Projects/data/redis:/data
 
+  influxdb-grafana:
+    image: philhawthorne/docker-influxdb-grafana:latest
+    container_name: docker-influxdb-grafana
+    ports:
+      - "3003:3003"   # Grafana UI
+      - "3004:8083"   # InfluxDB Admin UI
+      - "8086:8086"   # InfluxDB HTTP API
+    volumes:
+      #- ~/Projects/influxdb:/var/lib/influxdb
+      - ~/Projects/grafana:/var/lib/grafana
+    restart: unless-stopped
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.6.1
     container_name: zookeeper
@@ -106,6 +118,8 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+
+
 networks:
   default:
     driver: bridge

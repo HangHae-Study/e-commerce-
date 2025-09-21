@@ -48,6 +48,7 @@ public class PointController {
             @Valid @RequestBody BalanceChargeRequest req) {
 
         Users user = userService.chargePointWithLock(userId, req.amount(), req.reqId());
+        //Users user = userService.chargePoint(userId, req.amount(), req.reqId());
 
         BalanceChargeResponse data = new BalanceChargeResponse(user.getUserId(), user.getBalance());
 

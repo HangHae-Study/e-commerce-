@@ -46,6 +46,29 @@ public class RedisConfig {
         return tpl;
     }
 
+    @Bean("productRedisTemplate")
+    public RedisTemplate<String, Object> productRedisTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, Object> tpl = new RedisTemplate<>();
+        tpl.setConnectionFactory(connectionFactory);
+
+        // ObjectMapper 커스터마이징
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        mapper.registerModule(new JavaTimeModule()); // LocalDateTime, LocalDate 지원
+        mapper.findAndRegisterModules(); // 다른 모듈도 자동 등록
+
+        // Key: String / Value: JSON
+        StringRedisSerializer keySerializer = new StringRedisSerializer();
+        GenericJackson2JsonRedisSerializer valueSerializer = new GenericJackson2JsonRedisSerializer(mapper);
+
+        tpl.setKeySerializer(keySerializer);
+        tpl.setHashKeySerializer(keySerializer);
+        tpl.setValueSerializer(valueSerializer);
+        tpl.setHashValueSerializer(valueSerializer);
+        tpl.afterPropertiesSet();
+        return tpl;
+    }
+
     @Bean
     public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory connectionFactory) {
         return new StringRedisTemplate(connectionFactory);
