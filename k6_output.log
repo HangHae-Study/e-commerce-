@@ -1,0 +1,40 @@
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+     execution: local
+        script: /scripts/01_basic_order_test.js
+        output: InfluxDBv1 (http://host.docker.internal:8086)
+
+     scenarios: (100.00%) 1 scenario, 10 max VUs, 2m30s max duration (incl. graceful stop):
+              * create_order_scenario: Up to 10 looping VUs for 2m0s over 3 stages (gracefulRampDown: 30s, exec: userScenario, gracefulStop: 30s)
+
+
+running (0m01.0s), 00/10 VUs, 0 complete and 0 interrupted iterations
+create_order_scenario   [   1% ] 00/10 VUs  0m01.0s/2m00.0s
+
+running (0m02.0s), 00/10 VUs, 0 complete and 0 interrupted iterations
+create_order_scenario   [   2% ] 00/10 VUs  0m02.0s/2m00.0s
+
+running (0m03.0s), 00/10 VUs, 0 complete and 0 interrupted iterations
+create_order_scenario   [   2% ] 00/10 VUs  0m03.0s/2m00.0s
+
+
+  █ TOTAL RESULTS 
+
+    EXECUTION
+    vus.............: 0     min=0  max=0 
+    vus_max.........: 10    min=10 max=10
+
+    NETWORK
+    data_received...: 0 B   0 B/s
+    data_sent.......: 213 B 66 B/s
+
+
+
+
+running (0m03.3s), 00/10 VUs, 0 complete and 1 interrupted iterations
+create_order_scenario ✗ [   3% ] 01/10 VUs  0m03.2s/2m00.0s
