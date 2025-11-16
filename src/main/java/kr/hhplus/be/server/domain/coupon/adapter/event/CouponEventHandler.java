@@ -13,6 +13,6 @@ public class CouponEventHandler {
 
     @EventListener
     public void handleCouponEnqueue(CouponIssuedEvent event){
-        kafkaPublisher.publishCouponRequest(event);
+        //kafkaPublisher.publishCouponRequest(event);
     }
 }

@@ -40,6 +40,7 @@ public class UserService {
          return user;
     }
 
+    //@Transactional
     public PointDao getPoint(Long userId){
         PointDao pointDao = pointRepository.findByUserId(userId)
                 //pointRepository.findByIdWithPessimisticLock(userId)

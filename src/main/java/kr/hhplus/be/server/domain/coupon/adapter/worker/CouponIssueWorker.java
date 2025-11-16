@@ -15,7 +15,6 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -47,10 +46,11 @@ public class CouponIssueWorker {
      * (cron 표현식: 초 분 시 일 월 요일)
      * "0/1 * * * * *" → 매초 실행
      */
-    //@Scheduled(cron = "0/1 * * * * *")
-    public void processCouponIssueQueue(Long couponId) {
+    @Scheduled(cron = "0/1 * * * * *")
+    public void processCouponIssueQueue() {
+        Long couponId = 1L;
         // 발급 대기열에서 최대 1명 꺼내기
-        List<String> userIds = queue.popOldestMembers(couponId, 1L);
+        List<String> userIds = queue.popOldestMembers(1L, 1L);
         if (userIds == null || userIds.isEmpty()) {
             return;
         }

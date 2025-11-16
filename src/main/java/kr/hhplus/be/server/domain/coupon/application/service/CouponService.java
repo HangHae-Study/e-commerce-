@@ -57,6 +57,7 @@ public class CouponService {
 
         CouponCacheKeyProvider.CouponClaimStatus issuedStatus = couponIssuedCacheRepository.getClaimStatus(couponId, userId).get();
 
+        System.out.println(couponId);
         if(issuedStatus.equals(ISSUED)){
             if(couponCode.isBlank()){
                 throw new InvalidCouponException("INVALID COUPON CODE");
